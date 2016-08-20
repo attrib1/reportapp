@@ -1,3 +1,9 @@
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_swipe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_above="@+id/im_net_connect"
+    android:layout_alignParentTop="true">
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -22,3 +28,4 @@
         android:layout_below="@+id/toolbar" />
 
 </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>

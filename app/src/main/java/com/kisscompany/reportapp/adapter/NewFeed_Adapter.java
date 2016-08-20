@@ -1,35 +1,30 @@
 package com.kisscompany.reportapp.adapter;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
-import com.kisscompany.reportapp.util.NewFeed;
+import com.kisscompany.reportapp.util.PostClass;
 
 import java.util.List;
 
 /**
  * Created by chanpc on 8/9/2016.
  */
-public class NewFeed_Adapter extends ArrayAdapter<NewFeed> {
+public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
     ImageView profile,incident;
     TextView text;
     int widthInDP;
-    public NewFeed_Adapter(Context context, List<NewFeed> list) {
+    public NewFeed_Adapter(Context context, List<PostClass> list) {
         super(context, R.layout.newfeed_layout,list);
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
@@ -41,11 +36,19 @@ public class NewFeed_Adapter extends ArrayAdapter<NewFeed> {
     public View getView(int position,View convertView,ViewGroup parent)
     {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        View customView = inflater.inflate(R.layout.newfeed_layout,parent,false);
-        profile = (ImageView)customView.findViewById(R.id.profile);
-        incident = (ImageView)customView.findViewById(R.id.incident);
-        incident.getLayoutParams().height = widthInDP;
-        text = (TextView) customView.findViewById(R.id.date);
+
+        View customView;
+        if(position < 3) {
+            customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
+            profile = (ImageView)customView.findViewById(R.id.profile);
+            incident = (ImageView)customView.findViewById(R.id.incident);
+            incident.getLayoutParams().height = widthInDP;
+            incident.setImageBitmap(getItem(position).getPic());
+            text = (TextView) customView.findViewById(R.id.date);
+        }
+        else
+            customView= inflater.inflate(R.layout.loading_layout,parent,false);
+
         return  customView;
     }
 }

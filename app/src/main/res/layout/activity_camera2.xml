@@ -8,22 +8,26 @@
 
     tools:context="com.kisscompany.reportapp.activity.Camera">
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar2"
+        android:id="@+id/toolbar3"
         android:minHeight="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:titleTextColor="@android:color/white"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetRight="0dp"
+        android:clipToPadding="false"
         android:background="#3d70b6">
     </android.support.v7.widget.Toolbar>
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/tempImg"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/Actype"
-        android:layout_below="@+id/toolbar2" />
+        android:layout_below="@+id/toolbar3" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -42,14 +46,18 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:id="@+id/imageView2"
-                android:src="@drawable/ic_money" />
+                android:id="@+id/type1"
+                android:tag="ic_money"
+                android:src="@drawable/ic_money"
+                android:onClick="Click" />
 
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:tag="ic_heart"
                 android:layout_marginLeft="10dp"
-                android:id="@+id/imageView4"
+                android:id="@+id/type2"
+
                 android:src="@drawable/ic_heart"
                 android:onClick="Click" />
 
@@ -57,40 +65,48 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
-                android:id="@+id/imageView6"
+                android:id="@+id/type3"
+                android:tag="type3"
+                android:src="@drawable/ice_home_boom" />
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:tag="type4"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/type4"
+
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
-                android:id="@+id/imageView7"
+                android:tag="type5"
+                android:id="@+id/type5"
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
-                android:id="@+id/imageView8"
+                android:id="@+id/type6"
+                android:tag="type6"
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
-                android:id="@+id/imageView9"
-                android:src="@drawable/ice_home_boom" />
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:tag="type7"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/imageView10"
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:tag="type8"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/imageView11"
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
+                android:tag="type9"
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/imageView12"
@@ -122,10 +138,38 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView5"
+            android:id="@+id/reTake"
             android:paddingLeft="10dp"
             android:layout_alignParentBottom="true"
             android:paddingBottom="10dp"
             android:src="@drawable/ic_re" />
-    </RelativeLayout>>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type : "
+        android:id="@+id/textView2"
+        android:layout_above="@+id/Actype"
+        android:layout_alignLeft="@+id/tempImg"
+        android:layout_alignStart="@+id/tempImg"
+
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/typeTxt"
+        android:layout_alignTop="@+id/textView2"
+        android:layout_toRightOf="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:id="@+id/colorTab"
+        android:layout_alignTop="@+id/tempImg"
+        android:layout_centerHorizontal="true" />>
 </RelativeLayout>
