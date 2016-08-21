@@ -97,24 +97,6 @@ public class twitt_fragment extends ListFragment {
             }
         };
         swipe.setOnRefreshListener(refreshListener);
-       /* twitter.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                progress.setVisibility(View.INVISIBLE);
-                twitter.removeOnLayoutChangeListener(this);
-
-            }
-        });
-        twitter.deferNotifyDataSetChanged();*/
-       /* swipe.post(new Runnable() {
-            @Override public void run() {
-                swipe.setRefreshing(true);
-                refreshListener.onRefresh();
-
-
-            }
-        });*/
         Log.d("createView","view");
         return twitterView;
     }
@@ -131,6 +113,17 @@ public class twitt_fragment extends ListFragment {
 
 
 
+    }
+    @Override
+    public void onPause(){
+        Log.d("destroy","destroy");
+        swipe.setRefreshing(false);
+        if (swipe!=null) {
+            swipe.setRefreshing(false);
+            swipe.destroyDrawingCache();
+            swipe.clearAnimation();
+        }
+        super.onPause();
     }
 
 }

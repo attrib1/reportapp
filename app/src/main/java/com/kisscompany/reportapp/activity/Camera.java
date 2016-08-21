@@ -195,6 +195,14 @@ public class Camera extends AppCompatActivity {
                 break;
             case R.id.type2: color = "#4Dffff00";
                 break;
+            case R.id.type3: color = "#4Dafff00";
+                break;
+            case R.id.type4: color = "#4Dfaf300";
+                break;
+            case R.id.type5: color = "#4Dfcfa00";
+                break;
+            case R.id.type6: color = "#4Da0fb00";
+                break;
         }
         pic = v.getTag().toString();
         colorTab.setBackgroundColor(Color.parseColor(color));

@@ -66,30 +66,34 @@
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/type3"
-                android:tag="type3"
-                android:src="@drawable/ice_home_boom" />
+                android:tag="ice_home_boom"
+                android:src="@drawable/ice_home_boom"
+                android:onClick="Click" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:tag="type4"
+                android:tag="ic_umbrella"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/type4"
-
-                android:src="@drawable/ice_home_boom" />
+                android:src="@drawable/ic_umbrella"
+                android:nestedScrollingEnabled="false"
+                android:onClick="Click" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
-                android:tag="type5"
+                android:tag="ic_helicopter"
                 android:id="@+id/type5"
-                android:src="@drawable/ice_home_boom" />
+                android:src="@drawable/ic_helicopter"
+                android:onClick="Click" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/type6"
-                android:tag="type6"
-                android:src="@drawable/ice_home_boom" />
+                android:tag="ic_car_crash"
+                android:src="@drawable/ic_car_crash"
+                android:onClick="Click" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"

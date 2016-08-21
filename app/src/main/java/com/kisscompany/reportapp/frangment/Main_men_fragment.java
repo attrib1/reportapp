@@ -4,6 +4,7 @@ package com.kisscompany.reportapp.frangment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -55,7 +56,7 @@ public class Main_men_fragment extends Fragment {
         list = new ArrayList<PostClass>();
         ListAdapter adapter = new NewFeed_Adapter(getActivity(),list);
         feed_list.setAdapter(adapter);
-        feed_list.setOnScrollListener(new AbsListView.OnScrollListener() {
+        feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
@@ -89,6 +90,17 @@ public class Main_men_fragment extends Fragment {
             }
         });
         return customView;
+    }
+    @Override
+    public void onPause(){
+        Log.d("destroy","destroy");
+        refresh.setRefreshing(false);
+        if (refresh!=null) {
+            refresh.setRefreshing(false);
+            refresh.destroyDrawingCache();
+            refresh.clearAnimation();
+        }
+        super.onPause();
     }
 
 }

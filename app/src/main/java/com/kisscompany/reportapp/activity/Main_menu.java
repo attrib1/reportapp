@@ -75,7 +75,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         tabHost = (FragmentTabHost)findViewById(R.id.tab);/////////////////create tab host
         tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
         Resources res = getResources();
-        TabHost.TabSpec tab1 = tabHost.newTabSpec("tab1");
+        final TabHost.TabSpec tab1 = tabHost.newTabSpec("tab1");
         TabHost.TabSpec tab2 = tabHost.newTabSpec("tab2");
         TabHost.TabSpec tab3 = tabHost.newTabSpec("tab3");
         TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
@@ -115,6 +115,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivity(camera);
                 }*/
+                tabHost.destroyDrawingCache();
                 setTabColor(tabHost);
 
             }

@@ -74,8 +74,8 @@
                 android:id="@+id/relativeLayout2">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:id="@+id/imageView5"
                     android:src="@drawable/calendar"
                     android:layout_alignParentTop="true"
@@ -85,8 +85,8 @@
                     android:layout_marginTop="10dp" />
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:id="@+id/location"
                     android:src="@drawable/location_icon"
                     android:layout_below="@+id/imageView5"
@@ -105,17 +105,19 @@
                     android:layout_toRightOf="@+id/imageView5"
                     android:layout_toEndOf="@+id/imageView5"
                     android:layout_alignParentTop="true"
-                    android:layout_marginLeft="5dp" />
+                    android:layout_marginLeft="5dp"
+                    android:textSize="10dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=": ถนนศรีอยุธยา"
-                    android:gravity="left"
+                    android:gravity="center_vertical"
                     android:id="@+id/addressText"
                     android:layout_below="@+id/imageView5"
                     android:layout_alignBottom="@+id/location"
                     android:textSize="10dp"
+
                     android:layout_toLeftOf="@+id/textView8"
                     android:layout_alignLeft="@+id/dateText"
                     android:layout_alignStart="@+id/dateText" />

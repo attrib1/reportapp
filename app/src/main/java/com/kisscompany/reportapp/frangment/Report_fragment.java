@@ -176,7 +176,7 @@ public class Report_fragment extends Fragment {
                 String street = addresses.get(0).getPostalCode();
                 String df = addresses.get(0).getLocality();
                 String af = addresses.get(0).getSubLocality();
-                address.setText(Addres_+" "+af+" "+df+" "+City+""+street);
+                address.setText(Addres_+" "+af+" "+df+" "+City+" "+street);
 
 
 
