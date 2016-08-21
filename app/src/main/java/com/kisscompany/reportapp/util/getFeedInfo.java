@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -54,10 +55,12 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
     Activity act;
     ListView listV;
-    public getFeedInfo(Activity a,ListView list)
+    SwipeRefreshLayout refresh;
+    public getFeedInfo(Activity a,ListView list,SwipeRefreshLayout r)
     {
         act = a;
         listV = list;
+        refresh = r;
     }
 
     @Override
@@ -77,23 +80,25 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                     .setServiceAccountScopes(scopes)
                     .setServiceAccountPrivateKeyFromP12File(file)
                     .build();
-            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+"353086.jpeg";
+            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+"353086.jpg";
             HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
             GenericUrl url2 = new GenericUrl(URI);
-            HttpRequestFactory requestFactory2 = httpTransport.createRequestFactory(credential);
-            HttpRequest get = requestFactory2.buildGetRequest(new GenericUrl("https://storage.googleapis.com/traffy_image/353086.jpeg"));
+            HttpRequest get = requestFactory.buildGetRequest(url2);
             HttpResponse response2 = get.execute();
             final Bitmap bm = BitmapFactory.decodeStream(response2.getContent());
 
             final List<PostClass> posts = new ArrayList<PostClass>();
             posts.add(new PostClass(bm));
+            posts.add(null);
             final ListAdapter adapter = new NewFeed_Adapter(act,posts);
             act.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     listV.setAdapter(adapter);
+                    refresh.setRefreshing(false);
                 }
             });
+            response2.disconnect();
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
            /* while((line = reader.readLine())!=null)
             {
@@ -118,7 +123,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 buff.append(line);
             }
             Log.d("Bitmap",buff.toString());*/
-                //reader.close();
+            //reader.close();
 
         } catch (MalformedURLException e) {
             e.printStackTrace();

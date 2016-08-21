@@ -30,7 +30,6 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         DisplayMetrics dm = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dm);
         widthInDP = Math.round(dm.widthPixels);
-        Log.d("width",String.valueOf(widthInDP));
     }
     @Override
     public View getView(int position,View convertView,ViewGroup parent)
@@ -38,7 +37,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View customView;
-        if(position < 3) {
+        if(position < 1) {
             customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
             profile = (ImageView)customView.findViewById(R.id.profile);
             incident = (ImageView)customView.findViewById(R.id.incident);

@@ -62,7 +62,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     private LocationAvailability locationAvailability;
     private static final int REQUEST_LOCATION = 0;
     private LocationRequest locationRequest;
-    String lat="",lng="";
+    public static String lat="",lng="";
     private FragmentTabHost tabHost;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +145,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         }//unselected
         text = (TextView)tabhost.getTabWidget().getChildAt(tabhost.getCurrentTab()).findViewById(R.id.header);
         text.setTextColor(Color.WHITE);
-       view = (ImageView)tabhost.getTabWidget().getChildAt(tabhost.getCurrentTab()).findViewById(R.id.tabIcon);
+        view = (ImageView)tabhost.getTabWidget().getChildAt(tabhost.getCurrentTab()).findViewById(R.id.tabIcon);
         res = getResources().getIdentifier(view.getTag().toString()+"_white","drawable",getPackageName());
         view.setImageDrawable(ResourcesCompat.getDrawable(getResources(),res,null));
         tabhost.getTabWidget().getChildAt(tabhost.getCurrentTab()).setBackgroundColor(Color.parseColor("#3d70b6")); //2nd tab selected
@@ -206,10 +206,10 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     locationRequest, this);
 
 
-                LocationManager manager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    Toast.makeText(Main_menu.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
-                }
+            LocationManager manager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Toast.makeText(Main_menu.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
+            }
 
 
         }

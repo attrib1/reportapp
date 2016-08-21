@@ -1,4 +1,4 @@
- package com.kisscompany.reportapp.frangment;
+package com.kisscompany.reportapp.frangment;
 
 
 import android.os.Bundle;
@@ -20,14 +20,15 @@ import com.kisscompany.reportapp.util.getFeedInfo;
 
 import java.util.ArrayList;
 
- /**
+/**
  * A simple {@link Fragment} subclass.
  */
 public class Main_men_fragment extends Fragment {
 
     ListView feed_list;
-     SwipeRefreshLayout refresh;
-     ArrayList<PostClass> list;
+    SwipeRefreshLayout refresh;
+    ArrayList<PostClass> list;
+    SwipeRefreshLayout.OnRefreshListener refreshListener;
     public Main_men_fragment() {
         // Required empty public constructor
     }
@@ -40,17 +41,17 @@ public class Main_men_fragment extends Fragment {
         View customView = inflater.inflate(R.layout.fragment_main_men_fragment,container,false);
         refresh = (SwipeRefreshLayout)customView.findViewById(R.id.main_swipe);////refresh bar
         //refresh.setRefreshing(false);
-
         feed_list = (ListView)customView.findViewById(R.id.newFeedList);
-        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 //////refresh task
-                new getFeedInfo(getActivity(),feed_list).execute("https://storage.googleapis.com/traffy_image/pic1.png");
-                refresh.setRefreshing(false);
+                new getFeedInfo(getActivity(),feed_list,refresh).execute("https://storage.googleapis.com/traffy_image/pic1.png");
                 refresh.setEnabled(false);
             }
-        });
+        };
+        refresh.setOnRefreshListener(refreshListener);
         list = new ArrayList<PostClass>();
         ListAdapter adapter = new NewFeed_Adapter(getActivity(),list);
         feed_list.setAdapter(adapter);
@@ -81,6 +82,12 @@ public class Main_men_fragment extends Fragment {
             }
         });
 
+        refresh.post(new Runnable() {
+            @Override public void run() {
+                refresh.setRefreshing(true);
+                refreshListener.onRefresh();
+            }
+        });
         return customView;
     }
 

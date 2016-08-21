@@ -56,12 +56,11 @@ import javax.net.ssl.HttpsURLConnection;
 public class  uploadImageGoogle extends AsyncTask<String,String,String> {
     Bitmap image;
     Activity current;
-    ImageView img;
-    public uploadImageGoogle(Bitmap i, String t, Activity act, ImageView im)
+    public uploadImageGoogle(Bitmap i, Activity act)
     {
         image = i;
         current = act;
-        img = im;
+
     }
     @Override
     protected String doInBackground(String... params) {
@@ -73,9 +72,7 @@ public class  uploadImageGoogle extends AsyncTask<String,String,String> {
             List<String> scopes = new ArrayList<String>();
             scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
             HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
-            //agarro la key y la convierto en un file
             AssetManager am = current.getAssets();
-          //  String STORAGE_SCOPE = "https://www.google.com/analytics/feeds/" ;
             InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
             //convert key into class File. from inputstream to file. in an aux class.
             File file =stream2file(inputStream);
@@ -87,31 +84,22 @@ public class  uploadImageGoogle extends AsyncTask<String,String,String> {
                     .setServiceAccountScopes(scopes)
                     .setServiceAccountPrivateKeyFromP12File(file)
                     .build();
-            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+"353086.jpg";
+            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+params[0];
             HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
             GenericUrl url2 = new GenericUrl(URI);
             //byte array holds the data, in this case the image i want to upload in bytes.
             final Bitmap bitmap = image;
-
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
             byte[] bitMapData = stream.toByteArray();
-            Log.d("bitmap",String.valueOf(bitMapData.length));
             HttpContent contentsend = new ByteArrayContent("image/jpeg", bitMapData );
             HttpRequest putRequest;
             putRequest = requestFactory.buildPutRequest(url2, contentsend);
-
-            Log.d("noob","noob");
             HttpResponse response = putRequest.execute();
             String content = response.parseAsString();
             Log.d("debug", "response is:"+response.getStatusCode());
             Log.d("debug", "response content is:"+content);
-            /*    output = connection.getOutputStream();
-            connection.connect();
-            int res = connection.getResponseCode();
-            Log.d("responsecode",String.valueOf(res));
-            image.compress(Bitmap.CompressFormat.JPEG,100,output);
-            output.close();*/
+            response.disconnect();
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -122,7 +110,7 @@ public class  uploadImageGoogle extends AsyncTask<String,String,String> {
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         } finally {
-//            connection.disconnect();
+
         }
 
         return null;

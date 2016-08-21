@@ -9,6 +9,7 @@ public class PostClass {
 
     String Owner,Content,Date,status;
     Bitmap mainPic,profile;
+    String adress;
     long    postID;
     int like;
     public PostClass(Bitmap b)
@@ -35,5 +36,9 @@ public class PostClass {
     public Bitmap getPic()
     {
         return mainPic;
+    }
+    public String getAdress()
+    {
+        return adress;
     }
 }

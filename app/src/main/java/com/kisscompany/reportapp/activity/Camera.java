@@ -1,17 +1,23 @@
 package com.kisscompany.reportapp.activity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -34,6 +40,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 
 public class Camera extends AppCompatActivity {
@@ -59,6 +67,7 @@ public class Camera extends AppCompatActivity {
         wm.getDefaultDisplay().getMetrics(dm);
         widthInDP = Math.round(dm.widthPixels);
 
+        verifyStoragePermissions(this);
         Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File dir=
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -71,6 +80,10 @@ public class Camera extends AppCompatActivity {
         inIm = (ImageView)findViewById(R.id.tempImg);
         typeText = (TextView)findViewById(R.id.typeTxt);
         reTake = (ImageView)findViewById(R.id.reTake);
+
+
+
+
         reTake.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +103,6 @@ public class Camera extends AppCompatActivity {
                     resultIntent.putExtra("Color", color);
                     resultIntent.putExtra("ImId",pic);
                     setResult(RESULT_OK, resultIntent);
-
                     finish();
                 }
                 else
@@ -121,9 +133,7 @@ public class Camera extends AppCompatActivity {
             Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath());
 
             inIm.setImageBitmap(temp);
-            uploadImageGoogle get = null;
-            get = new uploadImageGoogle(temp,"",this,inIm);
-            get.execute("https://www.googleapis.com/upload/storage/v1/b/traffy_image/o?uploadType=media&name=");
+
 
 
         }
@@ -149,7 +159,6 @@ public class Camera extends AppCompatActivity {
                     Crop.of(uri,uri).asSquare().start(this);
                 }
             }*/
-
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
 
             //rotateImage(90);
@@ -175,7 +184,7 @@ public class Camera extends AppCompatActivity {
         matrix.postRotate(angle);
         FileOutputStream out = new FileOutputStream(output);
         temp  = Bitmap.createBitmap(temp, 0, 0, temp.getWidth(), temp.getHeight(),matrix,true
-                );
+        );
         temp.compress(Bitmap.CompressFormat.JPEG,100,out);
     }
 
@@ -213,5 +222,25 @@ public class Camera extends AppCompatActivity {
         //inIm.setImageDrawable(bmd);
         return original;
     }
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;////verify permission
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have read or write permission
+        int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (writePermission != PackageManager.PERMISSION_GRANTED || readPermission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
 
 }
