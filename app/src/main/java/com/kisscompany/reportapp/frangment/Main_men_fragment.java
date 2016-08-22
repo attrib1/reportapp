@@ -118,6 +118,6 @@ public class Main_men_fragment extends Fragment {
         }
 
         super.onPause();
-    } 
+    }
 
 }
