@@ -107,6 +107,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             GenericUrl url2 = new GenericUrl(URI);
             //byte array holds the data, in this case the image i want to upload in bytes.
             final Bitmap bitmap = post.getPic();
+            Log.d("actualSize",String.valueOf(bitmap.getByteCount()));
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
             byte[] bitMapData = stream.toByteArray();

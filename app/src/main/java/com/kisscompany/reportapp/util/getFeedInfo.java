@@ -3,6 +3,7 @@ package com.kisscompany.reportapp.util;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -22,6 +23,8 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.IOUtils;
 import com.google.api.services.storage.StorageScopes;
+import com.kisscompany.reportapp.activity.LoginActivity;
+import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
 
 import org.json.JSONArray;
@@ -55,18 +58,25 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
     Activity act;
     ListView listV;
+    OnRefreshFinishListener mListener;
     List<PostClass> posts;
-    public getFeedInfo(Activity a,ListView list,SwipeRefreshLayout r)
+    public getFeedInfo(Activity a,ListView list)
     {
         act = a;
         listV = list;
         posts = new ArrayList<PostClass>();
     }
+    public interface OnRefreshFinishListener {
+        void onRefreshFinished();
+    }
 
+    public void setCustomEventListener(OnRefreshFinishListener eventListener) {
+        mListener = eventListener;
+    }
     @Override
     protected String doInBackground(String... params) {
         try {
-            URL url = new URL(params[0]);
+          /*  URL url = new URL(params[0]);
             StringBuffer buff = new StringBuffer();
             String line= "";
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -87,12 +97,17 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 String faceBook = JObject.getString("IDFacebook");
                 String address = JObject.getString("Address");
                 Bitmap BitmapPic = getPicture(picture);
-                PostClass currentPost = new PostClass(BitmapPic,d,address,content,faceBook,stat);
+               PostClass currentPost = new PostClass(BitmapPic,d,address,content,faceBook,stat);
                 posts.add(currentPost);
                 // re establish image url
             }
             connection.disconnect();
-            reader.close();
+            reader.close();*/
+            Bitmap BitmapPic = getPicture("353086.jpg");
+            posts.add(new PostClass(BitmapPic,"","","","",""));
+            BitmapPic = getPicture("353086.jpg");
+
+            posts.add(null);
             final ListAdapter adapter = new NewFeed_Adapter(act,posts);
             act.runOnUiThread(new Runnable() {
                 @Override
@@ -102,18 +117,15 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             });
 
 
-
-
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
+        mListener.onRefreshFinished();
         return null;
     }
     @Override
@@ -130,6 +142,54 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
 
     public Bitmap getPicture(String picName) throws GeneralSecurityException, IOException {
+        String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+picName;
+        GenericUrl url2 = new GenericUrl(URI);
+        HttpRequest get = LoginActivity.requestFactory.buildGetRequest(url2);
+        HttpResponse response2 = get.execute();
+        final Bitmap bm = BitmapFactory.decodeStream(response2.getContent());
+        response2.disconnect();
+        Log.d("getPic",String.valueOf(bm.getByteCount()));
+        return bm;
+    }
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                         int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
+    }
+
+   /* public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
         List<String> scopes = new ArrayList<String>();
         scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
         HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
@@ -143,13 +203,9 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 .setServiceAccountScopes(scopes)
                 .setServiceAccountPrivateKeyFromP12File(file)
                 .build();
-        String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+picName;
+
         HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-        GenericUrl url2 = new GenericUrl(URI);
-        HttpRequest get = requestFactory.buildGetRequest(url2);
-        HttpResponse response2 = get.execute();
-        final Bitmap bm = BitmapFactory.decodeStream(response2.getContent());
-        response2.disconnect();
-        return bm;
-    }
+        Log.d("finishCredential","finsih");
+        return requestFactory;
+    }*/
 }

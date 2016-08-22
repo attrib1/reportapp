@@ -1,6 +1,9 @@
 package com.kisscompany.reportapp.frangment;
 
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,6 +21,8 @@ import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
+
+import org.mortbay.jetty.Main;
 
 import java.util.ArrayList;
 
@@ -48,7 +53,19 @@ public class Main_men_fragment extends Fragment {
             @Override
             public void onRefresh() {
                 //////refresh task
-                new getFeedInfo(getActivity(),feed_list,refresh).execute("https://storage.googleapis.com/traffy_image/pic1.png");///input api
+                getFeedInfo feedInfo = new getFeedInfo(getActivity(),feed_list);///input api
+                feedInfo.setCustomEventListener(new getFeedInfo.OnRefreshFinishListener() {
+                    @Override
+                    public void onRefreshFinished() {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                refresh.setRefreshing(false);
+                            }
+                        });
+                    }
+                });
+                feedInfo.execute("https://storage.googleapis.com/traffy_image/pic1.png");
                 refresh.setEnabled(false);
             }
         };
@@ -69,7 +86,6 @@ public class Main_men_fragment extends Fragment {
                     if(v!=null )
                     {
                         int offset = v.getTop();
-                        Toast.makeText(getContext(), String.valueOf(v.getTop()), Toast.LENGTH_SHORT).show();
                         if(offset ==0) {
 
                             refresh.setEnabled(true);

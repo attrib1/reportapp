@@ -37,7 +37,10 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View customView;
-        if(position < 0) {
+        if(position == getCount()-1 || ((position%9)==1)&&position!=1) {
+            customView= inflater.inflate(R.layout.loading_layout,parent,false);
+        }
+        else{
             customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
             profile = (ImageView)customView.findViewById(R.id.profile);
             incident = (ImageView)customView.findViewById(R.id.incident);
@@ -45,8 +48,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             incident.setImageBitmap(getItem(position).getPic());
             text = (TextView) customView.findViewById(R.id.date);
         }
-        else
-            customView= inflater.inflate(R.layout.loading_layout,parent,false);
+
 
         return  customView;
     }

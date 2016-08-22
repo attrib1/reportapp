@@ -131,7 +131,6 @@ public class Camera extends AppCompatActivity {
             widthInDP = Math.round(dm.widthPixels);
             inIm.getLayoutParams().height = widthInDP;
             Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath());
-
             inIm.setImageBitmap(temp);
 
 
@@ -159,8 +158,9 @@ public class Camera extends AppCompatActivity {
                     Crop.of(uri,uri).asSquare().start(this);
                 }
             }*/
+            Log.d("ImageSize",String.valueOf(output.length()));
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
-
+            Log.d("ImageSize",String.valueOf(output.length()));
             //rotateImage(90);
             //inIm.getLayoutParams().height = widthInDP;
          /*   getFeedInfo feed = new getFeedInfo(inIm,this);
@@ -220,8 +220,8 @@ public class Camera extends AppCompatActivity {
     {
         int width  = original.getWidth();
         int height = original.getHeight();
-        int newWidth = width;
-        int newHeight = width;
+        int newWidth = 200;
+        int newHeight = 200;
 
         float scaleWidth = ((float) newWidth) / width;
         float scaleHeight = ((float) newHeight) / height;
