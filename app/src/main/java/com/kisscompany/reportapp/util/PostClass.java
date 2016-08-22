@@ -2,26 +2,36 @@ package com.kisscompany.reportapp.util;
 
 import android.graphics.Bitmap;
 
+import java.util.Date;
+
 /**
  * Created by chanpc on 8/9/2016.
  */
 public class PostClass {
 
-    String Owner,Content,Date,status;
+    String Owner="Chan",Content,status;
     Bitmap mainPic,profile;
     String adress;
+    String date;
+    String facebookID;
+    String type;
     long    postID;
     int like;
-    public PostClass(Bitmap b)
+    public PostClass(Bitmap b,String d,String l,String des,String id,String t)
     {
         mainPic = b;
+        date = d;
+        adress = l;
+        Content = des;
+        facebookID = id;
+        type = t;
     }
     public String getOwner()
     {
         return Owner;
     }
     public String getDate(){
-        return Date;
+        return date;
     }
     public String getContent()
     {
@@ -40,5 +50,12 @@ public class PostClass {
     public String getAdress()
     {
         return adress;
+    }
+    public String getFacebookID(){
+        return facebookID;
+    }
+    public String getType()
+    {
+        return  type;
     }
 }

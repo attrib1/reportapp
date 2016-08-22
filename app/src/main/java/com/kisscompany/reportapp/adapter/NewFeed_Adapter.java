@@ -37,7 +37,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View customView;
-        if(position < 1) {
+        if(position < 0) {
             customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
             profile = (ImageView)customView.findViewById(R.id.profile);
             incident = (ImageView)customView.findViewById(R.id.incident);

@@ -27,9 +27,6 @@ import com.google.api.client.util.IOUtils;
 import com.google.api.services.storage.StorageScopes;
 import com.twitter.sdk.android.core.models.ImageValue;
 
-
-import org.apache.http.HttpEntity;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,11 +61,7 @@ public class  uploadImageGoogle extends AsyncTask<String,String,String> {
     }
     @Override
     protected String doInBackground(String... params) {
-        OutputStream output = null;
-        HttpsURLConnection connection = null;
-        URL url = null;
         try {
-            String token= "AIzaSyDhKJvSmQcvieWpmKNgzNk56tu3DRPyo4k";
             List<String> scopes = new ArrayList<String>();
             scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
             HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
@@ -84,7 +77,7 @@ public class  uploadImageGoogle extends AsyncTask<String,String,String> {
                     .setServiceAccountScopes(scopes)
                     .setServiceAccountPrivateKeyFromP12File(file)
                     .build();
-            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+params[0];
+            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+"353086.jpg";
             HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
             GenericUrl url2 = new GenericUrl(URI);
             //byte array holds the data, in this case the image i want to upload in bytes.

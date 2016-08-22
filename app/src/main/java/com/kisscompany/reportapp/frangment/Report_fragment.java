@@ -37,6 +37,8 @@ import android.widget.Toast;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.activity.Camera;
 import com.kisscompany.reportapp.activity.Main_menu;
+import com.kisscompany.reportapp.util.PostClass;
+import com.kisscompany.reportapp.util.sendFeedInfo;
 import com.kisscompany.reportapp.util.uploadImageGoogle;
 import com.soundcloud.android.crop.Crop;
 import com.soundcloud.android.crop.CropImageActivity;
@@ -62,6 +64,7 @@ public class Report_fragment extends Fragment {
     ImageView typeImage;
     TextView date,info,address;
     Bitmap resultImage;
+    String imID;
     static final int REQUEST = 2;
     public Report_fragment() {
         // Required empty public constructor
@@ -90,7 +93,8 @@ public class Report_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 setCurrentTab(0);
-                new uploadImageGoogle(resultImage,getActivity()).execute("353086.jpg");
+                PostClass sendPost = createPost();
+                new sendFeedInfo(sendPost,getActivity()).execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
                 Toast.makeText(getContext(),"Done posting",Toast.LENGTH_SHORT).show();
             }
         });
@@ -121,7 +125,8 @@ public class Report_fragment extends Fragment {
             resultImage = BitmapFactory.decodeFile(data.getStringExtra("RESULT_STRING"));
 //            Bitmap finalPic = Camera.rotateImage(temp,90);
             incident.setImageBitmap(resultImage);
-            int res = getResources().getIdentifier(data.getStringExtra("ImId"),"drawable",getActivity().getPackageName());
+            imID = data.getStringExtra("ImId");
+            int res = getResources().getIdentifier(imID,"drawable",getActivity().getPackageName());
             typeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),res,null));
             getAddress();
             getDate();
@@ -142,6 +147,7 @@ public class Report_fragment extends Fragment {
     }
     @Override
     public void onPause() {
+        info.setText(" ");
         super.onPause();
     }
 
@@ -153,9 +159,9 @@ public class Report_fragment extends Fragment {
     }
     public void getDate()
     {
-        Date d = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd MM yyyy, hh:mm a");
-        date.setText(format.format(d));
+        Date currentDateTime = new Date(); //get date and time2
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        date.setText(format.format(currentDateTime));
     }
     public void getAddress()
     {
@@ -196,7 +202,11 @@ public class Report_fragment extends Fragment {
         FragmentTabHost mTabHost = (FragmentTabHost)getActivity().findViewById(R.id.tab);
         mTabHost.setCurrentTab(tab_index);
     }
-
+    public PostClass createPost()
+    {
+        PostClass newPost = new PostClass(resultImage,date.getText().toString() ,address.getText().toString(),info.getText().toString(),"ID5580907",imID);
+        return newPost;
+    }
 
 
 

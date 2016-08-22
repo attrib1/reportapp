@@ -55,52 +55,23 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
     Activity act;
     ListView listV;
-    SwipeRefreshLayout refresh;
+    List<PostClass> posts;
     public getFeedInfo(Activity a,ListView list,SwipeRefreshLayout r)
     {
         act = a;
         listV = list;
-        refresh = r;
+        posts = new ArrayList<PostClass>();
     }
 
     @Override
     protected String doInBackground(String... params) {
         try {
             URL url = new URL(params[0]);
-            List<String> scopes = new ArrayList<String>();
-            scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
-            HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
-            AssetManager am = act.getAssets();
-            InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
-            File file =stream2file(inputStream);
-            JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-            GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
-                    .setJsonFactory(JSON_FACTORY)
-                    .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
-                    .setServiceAccountScopes(scopes)
-                    .setServiceAccountPrivateKeyFromP12File(file)
-                    .build();
-            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+"353086.jpg";
-            HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-            GenericUrl url2 = new GenericUrl(URI);
-            HttpRequest get = requestFactory.buildGetRequest(url2);
-            HttpResponse response2 = get.execute();
-            final Bitmap bm = BitmapFactory.decodeStream(response2.getContent());
-
-            final List<PostClass> posts = new ArrayList<PostClass>();
-            posts.add(new PostClass(bm));
-            posts.add(null);
-            final ListAdapter adapter = new NewFeed_Adapter(act,posts);
-            act.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    listV.setAdapter(adapter);
-                    refresh.setRefreshing(false);
-                }
-            });
-            response2.disconnect();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-           /* while((line = reader.readLine())!=null)
+            StringBuffer buff = new StringBuffer();
+            String line= "";
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            while((line = reader.readLine())!=null)
             {
                 buff.append(line);
             }
@@ -109,27 +80,37 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 JSONObject JObject = JArray.getJSONObject(i);
                 String picture = JObject.getString("picture");
                 String name = JObject.getString("Name");
-                int like = JObject.getInt("like");
-                String content = JObject.getString("content");
-                String stat = JObject.getString("status");
-                Date d = new Date(JObject.getLong("time_Stamp") * 1000);
-                SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd HH:mm:ss a");
-                String date = format.format(d);
+                //int like = JObject.getInt("like");
+                String content = JObject.getString("Comment");
+                String stat = JObject.getString("Status");
+                String d = JObject.getString("Date");
+                String faceBook = JObject.getString("IDFacebook");
+                String address = JObject.getString("Address");
+                Bitmap BitmapPic = getPicture(picture);
+                PostClass currentPost = new PostClass(BitmapPic,d,address,content,faceBook,stat);
+                posts.add(currentPost);
                 // re establish image url
-                connection.disconnect();*/
-            /*BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            while((line = reader.readLine())!=null)
-            {
-                buff.append(line);
             }
-            Log.d("Bitmap",buff.toString());*/
-            //reader.close();
+            connection.disconnect();
+            reader.close();
+            final ListAdapter adapter = new NewFeed_Adapter(act,posts);
+            act.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listV.setAdapter(adapter);
+                }
+            });
+
+
+
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -146,4 +127,29 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         FileOutputStream out = new FileOutputStream(tempFile);
         IOUtils.copy(in, out);
         return tempFile; }
+
+
+    public Bitmap getPicture(String picName) throws GeneralSecurityException, IOException {
+        List<String> scopes = new ArrayList<String>();
+        scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
+        HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
+        AssetManager am = act.getAssets();
+        InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
+        File file =stream2file(inputStream);
+        JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+                .setJsonFactory(JSON_FACTORY)
+                .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
+                .setServiceAccountScopes(scopes)
+                .setServiceAccountPrivateKeyFromP12File(file)
+                .build();
+        String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+picName;
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
+        GenericUrl url2 = new GenericUrl(URI);
+        HttpRequest get = requestFactory.buildGetRequest(url2);
+        HttpResponse response2 = get.execute();
+        final Bitmap bm = BitmapFactory.decodeStream(response2.getContent());
+        response2.disconnect();
+        return bm;
+    }
 }

@@ -192,21 +192,27 @@ public class Camera extends AppCompatActivity {
     {
         switch(v.getId()){
             case R.id.type1:  color = "#4D00ff00";
+                typeText.setText("ปัญหา1");
                 break;
             case R.id.type2: color = "#4Dffff00";
+                typeText.setText("ปัญหา2");
                 break;
             case R.id.type3: color = "#4Dafff00";
+                typeText.setText("ปัญหา3");
                 break;
-            case R.id.type4: color = "#4Dfaf300";
+            case R.id.type4: color = "#4Dca1265";
+                typeText.setText("ปัญหา4");
                 break;
             case R.id.type5: color = "#4Dfcfa00";
+                typeText.setText("ปัญหา5");
                 break;
             case R.id.type6: color = "#4Da0fb00";
+                typeText.setText("ปัญหา6");
                 break;
         }
         pic = v.getTag().toString();
         colorTab.setBackgroundColor(Color.parseColor(color));
-        typeText.setText(v.getTag().toString());
+       // typeText.setText(v.getTag().toString());
 
 
     }

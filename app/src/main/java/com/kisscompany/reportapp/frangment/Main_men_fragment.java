@@ -48,7 +48,7 @@ public class Main_men_fragment extends Fragment {
             @Override
             public void onRefresh() {
                 //////refresh task
-                new getFeedInfo(getActivity(),feed_list,refresh).execute("https://storage.googleapis.com/traffy_image/pic1.png");
+                new getFeedInfo(getActivity(),feed_list,refresh).execute("https://storage.googleapis.com/traffy_image/pic1.png");///input api
                 refresh.setEnabled(false);
             }
         };

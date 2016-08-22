@@ -35,6 +35,26 @@
             android:textSize="15dp"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ประเภท: "
+            android:id="@+id/textView4"
+            android:textSize="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/typeImage"
+            android:layout_toStartOf="@+id/typeImage" />
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/typeImage"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_umbrella" />
+
     </RelativeLayout>
 
     <ImageView
