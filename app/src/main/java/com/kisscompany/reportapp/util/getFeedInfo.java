@@ -106,7 +106,17 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             Bitmap BitmapPic = getPicture("353086.jpg");
             posts.add(new PostClass(BitmapPic,"","","","",""));
             BitmapPic = getPicture("353086.jpg");
-
+            posts.add(new PostClass(BitmapPic,"","","","",""));
+            BitmapPic = getPicture("353086.jpg");
+            posts.add(new PostClass(BitmapPic,"","","","",""));
+            BitmapPic = getPicture("353086.jpg");
+            posts.add(new PostClass(BitmapPic,"","","","",""));
+            BitmapPic = getPicture("353086.jpg");
+            posts.add(new PostClass(BitmapPic,"","","","",""));
+            BitmapPic = getPicture("353086.jpg");
+            posts.add(new PostClass(BitmapPic,"","","","",""));
+            BitmapPic = getPicture("353086.jpg");
+            posts.add(new PostClass(BitmapPic,"","","","",""));
             posts.add(null);
             final ListAdapter adapter = new NewFeed_Adapter(act,posts);
             act.runOnUiThread(new Runnable() {

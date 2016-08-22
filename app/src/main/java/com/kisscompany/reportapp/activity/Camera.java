@@ -130,8 +130,15 @@ public class Camera extends AppCompatActivity {
             wm.getDefaultDisplay().getMetrics(dm);
             widthInDP = Math.round(dm.widthPixels);
             inIm.getLayoutParams().height = widthInDP;
-            Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath());
-            inIm.setImageBitmap(temp);
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(output.getAbsolutePath(),options);
+            options.inSampleSize = calculateInSampleSize(options, 400,400);
+            options.inJustDecodeBounds = false;
+            Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath(),options);
+            inIm.setImageBitmap(BitmapFactory.decodeFile(output.getAbsolutePath(),options));
+            Log.d("ImageSize2",String.valueOf(output.length()));
+            Log.d("ImageSize2",String.valueOf(temp.getByteCount()));
 
 
 
@@ -158,7 +165,7 @@ public class Camera extends AppCompatActivity {
                     Crop.of(uri,uri).asSquare().start(this);
                 }
             }*/
-            Log.d("ImageSize",String.valueOf(output.length()));
+
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
             Log.d("ImageSize",String.valueOf(output.length()));
             //rotateImage(90);
@@ -254,6 +261,28 @@ public class Camera extends AppCompatActivity {
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
 

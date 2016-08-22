@@ -116,7 +116,8 @@ public class Main_men_fragment extends Fragment {
             refresh.destroyDrawingCache();
             refresh.clearAnimation();
         }
+
         super.onPause();
-    }
+    } 
 
 }
