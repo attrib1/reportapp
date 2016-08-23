@@ -2,6 +2,8 @@ package com.kisscompany.reportapp.frangment;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -26,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -65,6 +68,7 @@ public class Report_fragment extends Fragment {
     TextView date,info,address;
     Bitmap resultImage;
     String imID;
+    ProgressDialog progress;
     static final int REQUEST = 2;
     public Report_fragment() {
         // Required empty public constructor
@@ -89,12 +93,23 @@ public class Report_fragment extends Fragment {
         info = (TextView)cameraView.findViewById(R.id.infoTxt);
         address = (TextView)cameraView.findViewById(R.id.addressText);
 
+
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setCurrentTab(0);
+                hideSoftKeyboard();
+                progress = new ProgressDialog(getContext());
+                Upload();
                 PostClass sendPost = createPost();
-                new sendFeedInfo(sendPost,getActivity()).execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
+                sendFeedInfo send =  new sendFeedInfo(sendPost,getActivity());
+                send.setCustomEventListener(new sendFeedInfo.OnRefreshFinishListener() {
+                    @Override
+                    public void onRefreshFinished() {
+                        setCurrentTab(0);
+                        progress.dismiss();
+                    }
+                });
+                send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
                 Toast.makeText(getContext(),"Done posting",Toast.LENGTH_SHORT).show();
             }
         });
@@ -134,9 +149,9 @@ public class Report_fragment extends Fragment {
             resultImage = BitmapFactory.decodeFile(path, options);
             incident.setImageBitmap(resultImage);
             imID = data.getStringExtra("ImId");
-            int res = getResources().getIdentifier(imID,"drawable",getActivity().getPackageName());
+
+            getAddress();int res = getResources().getIdentifier(imID,"drawable",getActivity().getPackageName());
             typeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),res,null));
-            getAddress();
             getDate();
             color.setBackgroundColor(Color.parseColor(data.getStringExtra("Color")));
             Log.d("resultOk","OK");
@@ -206,13 +221,19 @@ public class Report_fragment extends Fragment {
 
 
     }
-    public void setCurrentTab(int tab_index){
-        FragmentTabHost mTabHost = (FragmentTabHost)getActivity().findViewById(R.id.tab);
-        mTabHost.setCurrentTab(tab_index);
+    public void setCurrentTab(final int tab_index){
+        final FragmentTabHost mTabHost = (FragmentTabHost)getActivity().findViewById(R.id.tab);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTabHost.setCurrentTab(tab_index);
+            }
+        });
     }
     public PostClass createPost()
     {
         PostClass newPost = new PostClass(resultImage,date.getText().toString() ,address.getText().toString(),info.getText().toString(),"ID5580907",imID);
+
         return newPost;
     }
     public static int calculateInSampleSize(
@@ -237,6 +258,20 @@ public class Report_fragment extends Fragment {
 
         return inSampleSize;
     }
-
+    public void Upload()
+    {
+        progress.setCancelable(false);
+        progress.setMessage("Uploading ...");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setProgress(0);
+        progress.setMax(100);
+        progress.show();
+    }
+    public void hideSoftKeyboard() {
+        if(getActivity().getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
+    }
 
 }

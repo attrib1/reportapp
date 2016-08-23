@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
     public static String profilePicUrl;
     public static String userName;
+    public static String facebookName;
     public static HttpRequestFactory requestFactory;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +75,15 @@ public class LoginActivity extends AppCompatActivity {
                                             // set profile image to imageview using Picasso or Native methods
                                             profilePicUrl = temp;
                                         }
+                                        if(data.has("id"))
+                                        {
+                                            userName = data.getString("id");
+                                            Log.d("id",userName);
+                                        }
                                         if(data.has("name"))
                                         {
-                                            userName = data.getString("name");
+                                            facebookName = data.getString("name");
+                                            Log.d("username",facebookName);
                                         }
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -132,4 +139,9 @@ public class LoginActivity extends AppCompatActivity {
         FileOutputStream out = new FileOutputStream(tempFile);
         IOUtils.copy(in, out);
         return tempFile; }
+    @Override
+    public void onPause(){
+        LoginManager.getInstance().logOut();
+        super.onPause();
+    }
 }

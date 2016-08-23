@@ -26,6 +26,8 @@ import com.google.api.services.storage.StorageScopes;
 import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
+import com.kisscompany.reportapp.adapter.historyAdapter;
+import com.kisscompany.reportapp.frangment.Main_men_fragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +42,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,12 +61,14 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
     Activity act;
     ListView listV;
-    OnRefreshFinishListener mListener;
+    OnRefreshFinishListener mListener = null;
     List<PostClass> posts;
-    public getFeedInfo(Activity a,ListView list)
+    Class c;
+    public getFeedInfo(Activity a,ListView list,Class l)
     {
         act = a;
         listV = list;
+        c = l;
         posts = new ArrayList<PostClass>();
     }
     public interface OnRefreshFinishListener {
@@ -76,49 +81,43 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     @Override
     protected String doInBackground(String... params) {
         try {
-          /*  URL url = new URL(params[0]);
+            URL url = new URL(params[0]);
             StringBuffer buff = new StringBuffer();
             String line= "";
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestProperty("Cache-Control", "no-cache");
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             while((line = reader.readLine())!=null)
             {
                 buff.append(line);
             }
+            Log.d("reportM",buff.toString());
             JSONArray JArray = new JSONArray(buff.toString());
             for(int i = 0 ; i < JArray.length();i++) {
                 JSONObject JObject = JArray.getJSONObject(i);
-                String picture = JObject.getString("picture");
-                String name = JObject.getString("Name");
+                String picture = JObject.getString("id");
+                String name = JObject.getString("name");
                 //int like = JObject.getInt("like");
-                String content = JObject.getString("Comment");
-                String stat = JObject.getString("Status");
-                String d = JObject.getString("Date");
-                String faceBook = JObject.getString("IDFacebook");
-                String address = JObject.getString("Address");
+                String content = JObject.getString("comment");
+                String stat = JObject.getString("status");
+                String time = JObject.getString("time_stamp");
+                String faceBook = JObject.getString("facebook_id");
+                String address = JObject.getString("address");
                 Bitmap BitmapPic = getPicture(picture);
-               PostClass currentPost = new PostClass(BitmapPic,d,address,content,faceBook,stat);
+               PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,stat);
+                currentPost.setOwner(name);
+                currentPost.setProfilePic(getPicture(faceBook));
                 posts.add(currentPost);
                 // re establish image url
             }
             connection.disconnect();
-            reader.close();*/
-            Bitmap BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
-            BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
-            BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
-            BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
-            BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
-            BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
-            BitmapPic = getPicture("353086.jpg");
-            posts.add(new PostClass(BitmapPic,"","","","",""));
+            reader.close();
             posts.add(null);
-            final ListAdapter adapter = new NewFeed_Adapter(act,posts);
+            final ListAdapter adapter;
+            if(c.equals(Main_men_fragment.class))
+                adapter = new NewFeed_Adapter(act,posts);
+            else
+                adapter = new historyAdapter(act,posts);
             act.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -133,9 +132,11 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             e.printStackTrace();
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
-        mListener.onRefreshFinished();
+        if(mListener!=null)
+            mListener.onRefreshFinished();
         return null;
     }
     @Override
@@ -161,61 +162,6 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         Log.d("getPic",String.valueOf(bm.getByteCount()));
         return bm;
     }
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
 
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-   /* public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
-        List<String> scopes = new ArrayList<String>();
-        scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
-        HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
-        AssetManager am = act.getAssets();
-        InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
-        File file =stream2file(inputStream);
-        JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
-                .setJsonFactory(JSON_FACTORY)
-                .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
-                .setServiceAccountScopes(scopes)
-                .setServiceAccountPrivateKeyFromP12File(file)
-                .build();
-
-        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-        Log.d("finishCredential","finsih");
-        return requestFactory;
-    }*/
 }

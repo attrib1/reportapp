@@ -3,6 +3,7 @@ package com.kisscompany.reportapp.activity;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -248,6 +250,13 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
 
 
     }
+    @Override
+    public void onDestroy()
+    {
+        Log.d("Destroyed","end");
+        LoginManager.getInstance().logOut();
 
+        super.onDestroy();
+    }
 
 }

@@ -58,4 +58,20 @@ public class PostClass {
     {
         return  type;
     }
+    public void setOwner(String owner)
+    {
+        Owner = owner;
+    }
+    public Bitmap getProfilePic()
+    {
+        return profile;
+    }
+    public void setProfilePic(Bitmap m)
+    {
+        profile = m;
+    }
+    public void setFacebookID(String a)
+    {
+        facebookID = a;
+    }
 }

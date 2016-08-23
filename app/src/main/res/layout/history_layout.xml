@@ -6,7 +6,7 @@
     <ImageView
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:id="@+id/imageView6"
+        android:id="@+id/smallincident"
         android:src="@drawable/test_profile"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
@@ -18,9 +18,9 @@
         android:text="วันที่ 29 สิงหาคม 2559"
         android:layout_gravity="center"
         android:id="@+id/date"
-        android:layout_alignTop="@+id/imageView6"
-        android:layout_toRightOf="@+id/imageView6"
-        android:layout_toEndOf="@+id/imageView6"
+        android:layout_alignTop="@+id/smallincident"
+        android:layout_toRightOf="@+id/smallincident"
+        android:layout_toEndOf="@+id/smallincident"
         android:layout_marginLeft="5dp" />
 
     <ImageView
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ถนนศรีอยุธยา"
-        android:id="@+id/road"
+        android:id="@+id/address"
         android:layout_below="@+id/date"
         android:layout_alignLeft="@+id/date"
         android:layout_alignStart="@+id/date"
@@ -48,8 +48,8 @@
         android:layout_height="wrap_content"
         android:text="ถนนชำรุด"
         android:id="@+id/infotext"
-        android:layout_below="@+id/road"
-        android:layout_alignLeft="@+id/road"
-        android:layout_alignStart="@+id/road"
+        android:layout_below="@+id/address"
+        android:layout_alignLeft="@+id/address"
+        android:layout_alignStart="@+id/address"
         android:layout_marginTop="5dp" />
 </RelativeLayout>

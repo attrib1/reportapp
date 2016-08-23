@@ -52,7 +52,9 @@
         android:fillViewport="false"
         android:layout_alignLeft="@+id/tempImg"
         android:layout_alignStart="@+id/tempImg"
-        android:layout_above="@+id/relativeLayout">
+        android:layout_above="@+id/relativeLayout"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -137,8 +139,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/Actype"
-        android:layout_alignStart="@+id/Actype"
+
+
         android:id="@+id/relativeLayout">
 
         <TextView

@@ -53,19 +53,21 @@ public class Main_men_fragment extends Fragment {
             @Override
             public void onRefresh() {
                 //////refresh task
-                getFeedInfo feedInfo = new getFeedInfo(getActivity(),feed_list);///input api
+                getFeedInfo feedInfo = new getFeedInfo(getActivity(),feed_list,Main_men_fragment.class);///input api
                 feedInfo.setCustomEventListener(new getFeedInfo.OnRefreshFinishListener() {
                     @Override
                     public void onRefreshFinished() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                refresh.setRefreshing(false);
-                            }
-                        });
+                        if(getActivity()!=null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refresh.setRefreshing(false);
+                                }
+                            });
+                        }
                     }
                 });
-                feedInfo.execute("https://storage.googleapis.com/traffy_image/pic1.png");
+                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=5");
                 refresh.setEnabled(false);
             }
         };

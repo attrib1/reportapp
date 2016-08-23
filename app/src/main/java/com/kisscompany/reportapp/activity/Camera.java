@@ -67,14 +67,17 @@ public class Camera extends AppCompatActivity {
         wm.getDefaultDisplay().getMetrics(dm);
         widthInDP = Math.round(dm.widthPixels);
 
-        verifyStoragePermissions(this);
-        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File dir=
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        output=new File(dir, "CameraContentDemo.jpeg");
-        camera.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(output));
+        if(savedInstanceState == null) {
+            // everything else that doesn't update UI
+            verifyStoragePermissions(this);
+            Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            File dir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+            output = new File(dir, "CameraContentDemo.jpeg");
+            camera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
+            startActivityForResult(camera,Cam_request);
+        }
         scroll = (HorizontalScrollView)findViewById(R.id.Actype);
-        startActivityForResult(camera,Cam_request);
         send = (TextView)findViewById(R.id.sendTxt);
         colorTab = (ImageView)findViewById(R.id.colorTab);
         inIm = (ImageView)findViewById(R.id.tempImg);
@@ -139,9 +142,6 @@ public class Camera extends AppCompatActivity {
             inIm.setImageBitmap(BitmapFactory.decodeFile(output.getAbsolutePath(),options));
             Log.d("ImageSize2",String.valueOf(output.length()));
             Log.d("ImageSize2",String.valueOf(temp.getByteCount()));
-
-
-
         }
         else if(request_code == Cam_request && result_code != RESULT_CANCELED){
             /*String[] projection = new String[]{
@@ -284,6 +284,7 @@ public class Camera extends AppCompatActivity {
 
         return inSampleSize;
     }
+
 
 
 }

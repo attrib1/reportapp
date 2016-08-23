@@ -10,8 +10,10 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.adapter.historyAdapter;
 import com.kisscompany.reportapp.util.PostClass;
+import com.kisscompany.reportapp.util.getFeedInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +36,9 @@ public class History_fragment extends Fragment {
         // Inflate the layout for this fragment
         histView = inflater.inflate(R.layout.fragment_history_fragment, container, false);
         hisList = (ListView)histView.findViewById(R.id.historyList);
-        List<PostClass> l = new ArrayList<PostClass>();
-        ListAdapter adapter = new historyAdapter(getContext(),l);
-        hisList.setAdapter(adapter);
+        getFeedInfo feedInfo = new getFeedInfo(getActivity(),hisList,History_fragment.class);
+        feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?facebook_id="+ LoginActivity.userName);
+
         return histView;
     }
 

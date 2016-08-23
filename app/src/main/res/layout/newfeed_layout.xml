@@ -18,10 +18,10 @@
             android:id="@+id/profile"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/test_profile" />
+            android:src="@drawable/nectec_building" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/nameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -117,14 +117,14 @@
     </LinearLayout>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="339dp"
             android:layout_height="wrap_content"
             android:paddingLeft="10dp"
-            android:textSize = "12dp"
             android:layout_marginBottom="7dp"
             android:paddingTop="3dp"
             android:text="Comment is a comment where we comment and we shit shat around and when i come around when we come around we waking up"
-            android:id="@+id/textView3" />
+            android:id="@+id/comment"
+            android:textSize="15dp" />
 
 
 </LinearLayout>

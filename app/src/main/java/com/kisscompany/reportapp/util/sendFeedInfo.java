@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.IOUtils;
 import com.google.api.services.storage.StorageScopes;
+import com.kisscompany.reportapp.activity.Camera;
+import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.frangment.Main_men_fragment;
 
@@ -52,7 +55,7 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class sendFeedInfo extends AsyncTask<String,String,String> {
 
-
+    OnRefreshFinishListener mListener;
     PostClass post;//content to post
     HttpURLConnection connection;
     Activity act;
@@ -62,6 +65,13 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         act = a;
     }
 
+    public interface OnRefreshFinishListener {
+        void onRefreshFinished();
+    }
+
+    public void setCustomEventListener(OnRefreshFinishListener eventListener) {
+        mListener = eventListener;
+    }
     @Override
     protected String doInBackground(String... params) {
         DataOutputStream output = null;
@@ -74,6 +84,8 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             connection.connect();
 
             output = new DataOutputStream(connection.getOutputStream());
+            post.setOwner(LoginActivity.facebookName);
+            post.setFacebookID(LoginActivity.userName);
             output.writeBytes(getUrlParam());
             output.flush();
             output.close();
@@ -87,45 +99,14 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             ///end of first phase
             ///begin second phase
 
-            List<String> scopes = new ArrayList<String>();
-            scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
-            HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
-            AssetManager am = act.getAssets();
-            InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
-            //convert key into class File. from inputstream to file. in an aux class.
-            File file =stream2file(inputStream);
-            JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-            //Google Credentianls
-            GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
-                    .setJsonFactory(JSON_FACTORY)
-                    .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
-                    .setServiceAccountScopes(scopes)
-                    .setServiceAccountPrivateKeyFromP12File(file)
-                    .build();
-            String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+"353086.jpg";
-            HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-            GenericUrl url2 = new GenericUrl(URI);
-            //byte array holds the data, in this case the image i want to upload in bytes.
-            final Bitmap bitmap = post.getPic();
-            Log.d("actualSize",String.valueOf(bitmap.getByteCount()));
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            byte[] bitMapData = stream.toByteArray();
-            HttpContent contentsend = new ByteArrayContent("image/jpeg", bitMapData );
-            HttpRequest putRequest;
-            putRequest = requestFactory.buildPutRequest(url2, contentsend);
-            HttpResponse response = putRequest.execute();
-            String content = response.parseAsString();
-            Log.d("debug", "response is:"+response.getStatusCode());
-            Log.d("debug", "response content is:"+content);
-            response.disconnect();
+            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
+            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
+            mListener.onRefreshFinished();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
         return null;
@@ -136,7 +117,8 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         url = url+"&Date="+String.valueOf(post.getDate())
                 +"&lat="+URLEncoder.encode(Main_menu.lat,"UTF-8")+"&lng="+URLEncoder.encode(Main_menu.lng,"UTF-8")+
         "&Comment="+URLEncoder.encode(post.getContent(),"UTF-8")+"&Address="+URLEncoder.encode(post.getAdress(),"UTF-8")+
-        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8")+"&Status="+URLEncoder.encode(post.getType(),"UTF-8");
+                "&Status="+URLEncoder.encode(post.getType(),"UTF-8")+
+        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8")+"&";
         Log.d("sendingParam",url);
         return url;
     }
@@ -146,4 +128,33 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         FileOutputStream out = new FileOutputStream(tempFile);
         IOUtils.copy(in, out);
         return tempFile; }
+    public void savePicture(String url,Bitmap bm) throws IOException {
+        Log.d("sendURL",url);
+        GenericUrl url2 = new GenericUrl(url);
+        //byte array holds the data, in this case the image i want to upload in bytes.
+        Log.d("actualSize",String.valueOf(bm.getByteCount()));
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] bitMapData = stream.toByteArray();
+        HttpContent contentsend = new ByteArrayContent("image/jpeg", bitMapData );
+        HttpRequest putRequest;
+        putRequest = LoginActivity.requestFactory.buildPutRequest(url2, contentsend);
+        HttpResponse response = putRequest.execute();
+      //  String content = response.parseAsString();
+     //   Log.d("debug", "response is:"+response.getStatusCode());
+     //   Log.d("debug", "response content is:"+content);
+        response.disconnect();
+
+    }
+    public Bitmap getProfilePic() throws IOException {
+        URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
+       // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
+        options.inSampleSize = Camera.calculateInSampleSize(options, 100,100);
+        options.inJustDecodeBounds = false;
+        Bitmap temp = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
+        return temp;
+    }
 }
