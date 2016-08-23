@@ -98,9 +98,10 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
          //   reader.close();
             ///end of first phase
             ///begin second phase
-
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
+            String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
+            createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
+            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
+            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
             mListener.onRefreshFinished();
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -156,5 +157,19 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         options.inJustDecodeBounds = false;
         Bitmap temp = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
         return temp;
+    }
+    public void createFolder(String url) throws IOException {
+        Log.d("sendURL",url);
+        GenericUrl url2 = new GenericUrl(url);
+        //byte array holds the data, in this case the image i want to upload in bytes.
+        byte[] b = new byte[0];
+        HttpContent contentsend = new ByteArrayContent("image/jpeg", b);
+        HttpRequest putRequest;
+        putRequest = LoginActivity.requestFactory.buildPutRequest(url2, contentsend);
+        HttpResponse response = putRequest.execute();
+        //  String content = response.parseAsString();
+        //   Log.d("debug", "response is:"+response.getStatusCode());
+        //   Log.d("debug", "response content is:"+content);
+        response.disconnect();
     }
 }

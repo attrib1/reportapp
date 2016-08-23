@@ -93,7 +93,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             }
             Log.d("reportM",buff.toString());
             JSONArray JArray = new JSONArray(buff.toString());
-            for(int i = 0 ; i < JArray.length();i++) {
+            for(int i = 0 ; i < 1;i++) {
                 JSONObject JObject = JArray.getJSONObject(i);
                 String picture = JObject.getString("id");
                 String name = JObject.getString("name");
@@ -103,10 +103,10 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 String time = JObject.getString("time_stamp");
                 String faceBook = JObject.getString("facebook_id");
                 String address = JObject.getString("address");
-                Bitmap BitmapPic = getPicture(picture);
+                Bitmap BitmapPic = getPicture(picture,name);
                PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,stat);
                 currentPost.setOwner(name);
-                currentPost.setProfilePic(getPicture(faceBook));
+                currentPost.setProfilePic(getPicture(faceBook,name));
                 posts.add(currentPost);
                 // re establish image url
             }
@@ -144,16 +144,12 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     {
 
     }
-    @SuppressLint("NewApi") public static File stream2file(InputStream in) throws IOException
-    { final File tempFile = File.createTempFile("okkk", null);
-        tempFile.deleteOnExit();
-        FileOutputStream out = new FileOutputStream(tempFile);
-        IOUtils.copy(in, out);
-        return tempFile; }
 
 
-    public Bitmap getPicture(String picName) throws GeneralSecurityException, IOException {
-        String URI = "https://storage.googleapis.com/" + "traffy_image"+"/"+picName;
+    public Bitmap getPicture(String picName,String fbName) throws GeneralSecurityException, IOException {
+        //String URI = "https://storage.googleapis.com/" + "traffy_image/"+picName;
+        Log.d("picNmae",picName);
+        String URI =  "https://storage.googleapis.com/" + "traffy_image/"+URLEncoder.encode(fbName,"UTF-8")+"/"+picName;
         GenericUrl url2 = new GenericUrl(URI);
         HttpRequest get = LoginActivity.requestFactory.buildGetRequest(url2);
         HttpResponse response2 = get.execute();

@@ -133,13 +133,13 @@ public class Camera extends AppCompatActivity {
             wm.getDefaultDisplay().getMetrics(dm);
             widthInDP = Math.round(dm.widthPixels);
             inIm.getLayoutParams().height = widthInDP;
-            final BitmapFactory.Options options = new BitmapFactory.Options();
+           /* final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(output.getAbsolutePath(),options);
             options.inSampleSize = calculateInSampleSize(options, 400,400);
-            options.inJustDecodeBounds = false;
-            Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath(),options);
-            inIm.setImageBitmap(BitmapFactory.decodeFile(output.getAbsolutePath(),options));
+            options.inJustDecodeBounds = false;*/
+            Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath());
+            inIm.setImageBitmap(temp);
             Log.d("ImageSize2",String.valueOf(output.length()));
             Log.d("ImageSize2",String.valueOf(temp.getByteCount()));
         }

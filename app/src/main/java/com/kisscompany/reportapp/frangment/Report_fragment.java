@@ -139,14 +139,14 @@ public class Report_fragment extends Fragment {
         {
             String path = data.getStringExtra("RESULT_STRING");
 
-            final BitmapFactory.Options options = new BitmapFactory.Options();
+           /* final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             resultImage = BitmapFactory.decodeFile(path,options);
             // Calculate inSampleSize
             options.inSampleSize = calculateInSampleSize(options, 400, 400);
             // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
-            resultImage = BitmapFactory.decodeFile(path, options);
+            options.inJustDecodeBounds = false;*/
+            resultImage = BitmapFactory.decodeFile(path);
             incident.setImageBitmap(resultImage);
             imID = data.getStringExtra("ImId");
 
