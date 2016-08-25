@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -39,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,12 +66,15 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     OnRefreshFinishListener mListener = null;
     List<PostClass> posts;
     Class c;
-    public getFeedInfo(Activity a,ListView list,Class l)
+    int index = 0;
+    JSONArray JArray;
+    public getFeedInfo(Activity a,ListView list,Class l,List flist)
     {
         act = a;
         listV = list;
         c = l;
         posts = new ArrayList<PostClass>();
+        posts = flist;
     }
     public interface OnRefreshFinishListener {
         void onRefreshFinished();
@@ -91,28 +96,13 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             {
                 buff.append(line);
             }
-            Log.d("reportM",buff.toString());
-            JSONArray JArray = new JSONArray(buff.toString());
-            for(int i = 0 ; i < 1;i++) {
-                JSONObject JObject = JArray.getJSONObject(i);
-                String picture = JObject.getString("id");
-                String name = JObject.getString("name");
-                //int like = JObject.getInt("like");
-                String content = JObject.getString("comment");
-                String stat = JObject.getString("status");
-                String time = JObject.getString("time_stamp");
-                String faceBook = JObject.getString("facebook_id");
-                String address = JObject.getString("address");
-                Bitmap BitmapPic = getPicture(picture,name);
-               PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,stat);
-                currentPost.setOwner(name);
-                currentPost.setProfilePic(getPicture(faceBook,name));
-                posts.add(currentPost);
-                // re establish image url
-            }
             connection.disconnect();
             reader.close();
-            posts.add(null);
+            Log.d("reportM",buff.toString());
+            JArray = new JSONArray(buff.toString());
+            posts = new ArrayList<PostClass>();
+            getTenItem();
+
             final ListAdapter adapter;
             if(c.equals(Main_men_fragment.class))
                 adapter = new NewFeed_Adapter(act,posts);
@@ -149,7 +139,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     public Bitmap getPicture(String picName,String fbName) throws GeneralSecurityException, IOException {
         //String URI = "https://storage.googleapis.com/" + "traffy_image/"+picName;
         Log.d("picNmae",picName);
-        String URI =  "https://storage.googleapis.com/" + "traffy_image/"+URLEncoder.encode(fbName,"UTF-8")+"/"+picName;
+        String URI =  "https://storage.googleapis.com/" + "traffy_image/"+picName;
         GenericUrl url2 = new GenericUrl(URI);
         HttpRequest get = LoginActivity.requestFactory.buildGetRequest(url2);
         HttpResponse response2 = get.execute();
@@ -157,6 +147,52 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         response2.disconnect();
         Log.d("getPic",String.valueOf(bm.getByteCount()));
         return bm;
+    }
+    public void getTenItem() throws JSONException, GeneralSecurityException, IOException {
+        int eraseIndex = -1;
+        if(posts.size()!=0)
+            eraseIndex = posts.size()-1;
+       /* if(posts.size()!=0 &&posts.get(posts.size()-1) ==null ) {
+            Log.d("ArraySize",String.valueOf(posts.size()));
+            eraseIndex = posts.size() - 1;
+        }*/
+        for(int i = index ; i < index+5 && i<JArray.length();i++) {
+            Log.d("index",String.valueOf(i));
+            JSONObject JObject = JArray.getJSONObject(i);
+            String picture = JObject.getString("id");
+            String name = JObject.getString("name");
+            //int like = JObject.getInt("like");
+            String content = JObject.getString("comment");
+            String stat = JObject.getString("status");
+            String time = JObject.getString("time_stamp");
+            String faceBook = JObject.getString("facebook_id");
+            String address = JObject.getString("address");
+            Bitmap BitmapPic = getPicture(picture,name);
+            PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,stat);
+            currentPost.setOwner(name);
+            currentPost.setProfilePic(getPicture(faceBook,name));
+            posts.add(currentPost);
+            // re establish image url
+        }
+        index = index +5;
+        posts.add(null);
+        final int finalEraseIndex = eraseIndex;
+        act.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                NewFeed_Adapter feedadapter = (NewFeed_Adapter)listV.getAdapter();
+                if(feedadapter!=null) {
+                    if(finalEraseIndex!=-1)
+                         posts.remove(finalEraseIndex);
+                    feedadapter.notifyDataSetChanged();
+                }
+                if(index >= JArray.length())
+                    Main_men_fragment.flag_loading = true;
+                else
+                    Main_men_fragment.flag_loading = false;
+            }
+        });
+
     }
 
 

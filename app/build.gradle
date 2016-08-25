@@ -20,11 +20,18 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
+    defaultConfig {
+        multiDexEnabled true
+    }
+    configurations {
+        all*.exclude group: 'com.google.firebase', module: 'firebase-common'
+    }
 
 }
 apply plugin: 'com.android.application'
 // Put Fabric plugin after Android plugin
 apply plugin: 'io.fabric'
+
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }

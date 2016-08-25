@@ -36,7 +36,6 @@ public class categoryAdapter extends ArrayAdapter<Category> {
 
         image = (ImageView)customView.findViewById(R.id.catIm);
         text = (TextView)customView.findViewById(R.id.catText);
-
         image.setImageDrawable(ResourcesCompat.getDrawable(customView.getResources(),getItem(position).getPicId(),null));
         text.setText(getItem(position).getText());
         text.setTextColor(Color.parseColor("#000000"));

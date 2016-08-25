@@ -22,9 +22,13 @@ import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
 
+import org.json.JSONException;
 import org.mortbay.jetty.Main;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,7 +38,10 @@ public class Main_men_fragment extends Fragment {
     ListView feed_list;
     SwipeRefreshLayout refresh;
     ArrayList<PostClass> list;
+    getFeedInfo feedInfo;
     SwipeRefreshLayout.OnRefreshListener refreshListener;
+    static public boolean flag_loading = false;
+    List<PostClass> feeds;
     public Main_men_fragment() {
         // Required empty public constructor
     }
@@ -53,7 +60,7 @@ public class Main_men_fragment extends Fragment {
             @Override
             public void onRefresh() {
                 //////refresh task
-                getFeedInfo feedInfo = new getFeedInfo(getActivity(),feed_list,Main_men_fragment.class);///input api
+                feedInfo = new getFeedInfo(getActivity(),feed_list,Main_men_fragment.class,feeds);///input api
                 feedInfo.setCustomEventListener(new getFeedInfo.OnRefreshFinishListener() {
                     @Override
                     public void onRefreshFinished() {
@@ -67,7 +74,7 @@ public class Main_men_fragment extends Fragment {
                         }
                     }
                 });
-                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=5");
+                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=100");
                 refresh.setEnabled(false);
             }
         };
@@ -85,18 +92,39 @@ public class Main_men_fragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem ==0){
                     View v = feed_list.getChildAt(0);
-                    if(v!=null )
-                    {
+                    if(v!=null ) {
                         int offset = v.getTop();
-                        if(offset ==0) {
+                        if (offset == 0) {
 
                             refresh.setEnabled(true);
-                        }
-                        else
+                        } else
                             refresh.setEnabled(false);
                     }
+                }
+                else if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount!=0)
+                {
+                    if(flag_loading == false)
+                    {
+                        flag_loading = true;
+                        Log.d("newItem","new");
+                            Thread t = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        feedInfo.getTenItem();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    } catch (GeneralSecurityException e) {
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        t.start();
 
 
+                    }
                 }
             }
         });
@@ -121,5 +149,6 @@ public class Main_men_fragment extends Fragment {
 
         super.onPause();
     }
+
 
 }

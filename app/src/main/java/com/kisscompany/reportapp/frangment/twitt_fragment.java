@@ -59,13 +59,16 @@ public class twitt_fragment extends ListFragment {
                     if(v!=null )
                     {
                         int offset = v.getTop();
-                        Toast.makeText(getContext(), String.valueOf(v.getTop()), Toast.LENGTH_SHORT).show();
+                 //       Toast.makeText(getContext(), String.valueOf(v.getTop()), Toast.LENGTH_SHORT).show();
                         if(offset ==0) {
 
                             swipe.setEnabled(true);
                         }
-                        else
+                        else {
                             swipe.setEnabled(false);
+                            Log.d("offset",String.valueOf(offset));
+                          //  Toast.makeText(getContext(),String.valueOf(offset),Toast.LENGTH_SHORT).show();
+                        }
                     }
 
 
@@ -97,12 +100,26 @@ public class twitt_fragment extends ListFragment {
             }
         };
         swipe.setOnRefreshListener(refreshListener);
+        swipe.post(new Runnable() {
+            @Override public void run() {
+                swipe.setRefreshing(true);
+                refreshListener.onRefresh();
+            }
+        });
         Log.d("createView","view");
         return twitterView;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
+
+    }
+    @Override
+    public void onResume()
+    {
         TwitterAuthConfig authConfig = new TwitterAuthConfig("Liq1M74Wl5FItzPzKDW1E73kb", "Jet9MZuvI5NqtR5eqeqBvgQzzCeKt8gk4NninD0sXVNXrhIZyB");
         Fabric.with(getContext(), new Twitter(authConfig));
         UserTimeline userTimeline = new UserTimeline.Builder().screenName("Traffy").build();
@@ -110,9 +127,7 @@ public class twitt_fragment extends ListFragment {
                 .setTimeline(userTimeline)
                 .build();
         setListAdapter(adapter);
-
-
-
+        super.onResume();
     }
     @Override
     public void onPause(){

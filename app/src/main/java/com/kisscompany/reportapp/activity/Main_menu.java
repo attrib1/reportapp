@@ -35,7 +35,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -63,6 +62,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     private static final int REQUEST_LOCATION = 0;
     private LocationRequest locationRequest;
     public static String lat="",lng="";
+    private boolean gps = true;
     private FragmentTabHost tabHost;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,7 +190,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                                     }
                                 }
                             });
-                    return;
                 }
             }
             ActivityCompat.requestPermissions(this,
@@ -210,10 +209,14 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             LocationManager manager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
             if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Toast.makeText(Main_menu.this, "คุณไม่ได้เปิด GPS", Toast.LENGTH_SHORT).show();
+                gps =  false;
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                return;
             }
 
 
         }
+        gps = true;
     }
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener
             onClickListener) {
@@ -251,12 +254,27 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
 
     }
     @Override
+    public void onResume(){
+        Log.d("chanzaa","SDFsdfds");
+        if(gps == false) {
+            Log.d("chanzaa","in");
+            getLocationConnect();
+        }
+        super.onResume();
+    }
+    @Override
     public void onDestroy()
     {
         Log.d("Destroyed","end");
-        LoginManager.getInstance().logOut();
-
         super.onDestroy();
     }
+   /* @Override
+    protected void onActivityResult(int request_code,int result_code,Intent data)
+    {
+        if(request_code == 1)
+        {
+            gps = getLocationConnect();
+        }
+    }*/
 
 }

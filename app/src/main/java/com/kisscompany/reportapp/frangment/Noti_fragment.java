@@ -37,11 +37,9 @@ public class Noti_fragment extends Fragment {
         List<Fragment> listFragment = new ArrayList<Fragment>();
         listFragment.add(new History_fragment());
         listFragment.add(new picture_Fragment());
-
         fragmentPagerAdapter adapter = new fragmentPagerAdapter(getChildFragmentManager() ,listFragment);
         viewPager.setAdapter( adapter);
         Log.d("create","again");
-
         return notiView;
     }
 

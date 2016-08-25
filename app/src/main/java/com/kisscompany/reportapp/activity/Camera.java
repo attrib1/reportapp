@@ -106,6 +106,7 @@ public class Camera extends AppCompatActivity {
                     resultIntent.putExtra("Color", color);
                     resultIntent.putExtra("ImId",pic);
                     setResult(RESULT_OK, resultIntent);
+                    Log.d("resultOk1","ok");
                     finish();
                 }
                 else

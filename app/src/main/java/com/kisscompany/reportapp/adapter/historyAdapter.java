@@ -1,6 +1,7 @@
 package com.kisscompany.reportapp.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,16 +28,24 @@ public class historyAdapter extends ArrayAdapter<PostClass> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
+
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        View customView = inflater.inflate(R.layout.history_layout,parent,false);
-        date = (TextView)customView.findViewById(R.id.date);
-        date.setText(getItem(position).getDate());
-        address = (TextView)customView.findViewById(R.id.address);
-        address.setText(getItem(position).getAdress());
-        info = (TextView)customView.findViewById(R.id.infotext);
-        info.setText(getItem(position).getContent());
-        img = (ImageView)customView.findViewById(R.id.smallincident);
-        img.setImageBitmap(getItem(position).getPic());
-        return  customView;
+        View customView;
+        if(position == getCount()-1 || ((position%9)==1)&&position!=1) {
+            customView= inflater.inflate(R.layout.loading_layout,parent,false);
+        }
+        else {
+            customView = inflater.inflate(R.layout.history_layout,parent,false);
+            date = (TextView) customView.findViewById(R.id.date);
+            date.setText(getItem(position).getDate());
+            address = (TextView) customView.findViewById(R.id.address);
+            address.setText(getItem(position).getAdress());
+            info = (TextView) customView.findViewById(R.id.infotext);
+            info.setText(getItem(position).getContent());
+            img = (ImageView) customView.findViewById(R.id.smallincident);
+            img.setImageBitmap(getItem(position).getPic());
+
+        }
+        return customView;
     }
 }

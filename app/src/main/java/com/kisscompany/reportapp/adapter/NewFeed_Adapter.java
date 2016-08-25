@@ -42,7 +42,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View customView;
-        if(position == getCount()-1 || ((position%9)==1)&&position!=1) {
+        if(getItem(position) ==null) {
             customView= inflater.inflate(R.layout.loading_layout,parent,false);
         }
         else{

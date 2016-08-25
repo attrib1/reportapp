@@ -1,16 +1,20 @@
 package com.kisscompany.reportapp.activity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookOperationCanceledException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -33,6 +37,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +52,17 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("cancel","cancel10");
         FacebookSdk.sdkInitialize(getApplicationContext());
+        Log.d("cancel","cancel9");
         setContentView(R.layout.activity_login);
+        Log.d("cancel","cancel8");
         callbackManager = CallbackManager.Factory.create();
+        Log.d("cancel","cancel7");
         LoginButton loginButton = (LoginButton) findViewById(R.id.loginButton);
         try {
             requestFactory = getCredential();
+            Log.d("cancel","cancel");
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -60,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                Log.d("cancel","cancel3");
                 Bundle params = new Bundle();
                 params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
                 new GraphRequest(AccessToken.getCurrentAccessToken(), "me", params, HttpMethod.GET,
@@ -98,12 +110,25 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-
+                Log.d("cancel","cancel5");
             }
 
             @Override
             public void onError(FacebookException error) {
-
+                if(error.getMessage().equals("CONNECTION_FAILURE: CONNECTION_FAILURE"))
+                {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginActivity.this);
+                    alertDialogBuilder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    alertDialogBuilder.setTitle("Network Error");
+                    alertDialogBuilder.setMessage("No internet connection");
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
             }
 
              });
@@ -113,6 +138,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+        Log.d("cancel","cancel2");
     }
     public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
         List<String> scopes = new ArrayList<String>();
@@ -143,5 +169,20 @@ public class LoginActivity extends AppCompatActivity {
     public void onPause(){
         LoginManager.getInstance().logOut();
         super.onPause();
+    }
+    public boolean isLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
+    }
+    public boolean checkInternet()
+    {
+        InetAddress inet;
+        try {
+            inet = InetAddress.getByName("www.google.com");
+            return true;
+        } catch (UnknownHostException e) {
+
+            return false;
+        }
     }
 }

@@ -36,9 +36,15 @@ public class History_fragment extends Fragment {
         // Inflate the layout for this fragment
         histView = inflater.inflate(R.layout.fragment_history_fragment, container, false);
         hisList = (ListView)histView.findViewById(R.id.historyList);
-        getFeedInfo feedInfo = new getFeedInfo(getActivity(),hisList,History_fragment.class);
+        List<PostClass> list = new ArrayList<PostClass>();
+        getFeedInfo feedInfo = new getFeedInfo(getActivity(),hisList,History_fragment.class,list);
         feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?facebook_id="+ LoginActivity.userName);
+        feedInfo.setCustomEventListener(new getFeedInfo.OnRefreshFinishListener() {
+            @Override
+            public void onRefreshFinished() {
 
+            }
+        });
         return histView;
     }
 

@@ -80,9 +80,10 @@ public class Report_fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-        Intent camera = new Intent(getContext(),Camera.class);
-        startActivityForResult(camera,REQUEST);
+        if(savedInstanceState==null) {
+            Intent camera = new Intent(getContext(), Camera.class);
+            startActivityForResult(camera, REQUEST);
+        }
         cameraView = inflater.inflate(R.layout.fragment_report_fragment, container, false);
 
         date = (TextView)cameraView.findViewById(R.id.dateText);
@@ -135,26 +136,28 @@ public class Report_fragment extends Fragment {
     public void onActivityResult(int request_code,int result_code,Intent data)
     {
 
+        Log.d("resultOk","OK");
         if(request_code == REQUEST && result_code == Activity.RESULT_OK)
         {
             String path = data.getStringExtra("RESULT_STRING");
 
-           /* final BitmapFactory.Options options = new BitmapFactory.Options();
+            final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             resultImage = BitmapFactory.decodeFile(path,options);
             // Calculate inSampleSize
             options.inSampleSize = calculateInSampleSize(options, 400, 400);
             // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;*/
-            resultImage = BitmapFactory.decodeFile(path);
+            options.inJustDecodeBounds = false;
+            resultImage = BitmapFactory.decodeFile(path,options);
             incident.setImageBitmap(resultImage);
             imID = data.getStringExtra("ImId");
+            File file = new File(path);
 
             getAddress();int res = getResources().getIdentifier(imID,"drawable",getActivity().getPackageName());
             typeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),res,null));
             getDate();
             color.setBackgroundColor(Color.parseColor(data.getStringExtra("Color")));
-            Log.d("resultOk","OK");
+
         }
         else if(request_code == REQUEST && result_code == 10)
         {
