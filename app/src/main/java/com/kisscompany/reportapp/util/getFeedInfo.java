@@ -9,10 +9,13 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.GenericUrl;
@@ -24,6 +27,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.IOUtils;
 import com.google.api.services.storage.StorageScopes;
+import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
@@ -34,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,7 +54,9 @@ import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -68,6 +75,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     Class c;
     int index = 0;
     JSONArray JArray;
+    long first;
     public getFeedInfo(Activity a,ListView list,Class l,List flist)
     {
         act = a;
@@ -90,6 +98,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             StringBuffer buff = new StringBuffer();
             String line= "";
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("GET");
             connection.setRequestProperty("Cache-Control", "no-cache");
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             while((line = reader.readLine())!=null)
@@ -104,8 +113,9 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             getTenItem();
 
             final ListAdapter adapter;
+            Queue<Integer> que = new LinkedList<Integer>();
             if(c.equals(Main_men_fragment.class))
-                adapter = new NewFeed_Adapter(act,posts);
+                adapter = new NewFeed_Adapter(act,posts,que);
             else
                 adapter = new historyAdapter(act,posts);
             act.runOnUiThread(new Runnable() {
@@ -138,13 +148,15 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
     public Bitmap getPicture(String picName,String fbName) throws GeneralSecurityException, IOException {
         //String URI = "https://storage.googleapis.com/" + "traffy_image/"+picName;
-        Log.d("picNmae",picName);
+        first = System.currentTimeMillis();
+      //  Log.d("picNmae",picName);
         String URI =  "https://storage.googleapis.com/" + "traffy_image/"+picName;
         GenericUrl url2 = new GenericUrl(URI);
         HttpRequest get = LoginActivity.requestFactory.buildGetRequest(url2);
         HttpResponse response2 = get.execute();
-        final Bitmap bm = BitmapFactory.decodeStream(response2.getContent());
+        final Bitmap bm = BitmapFactory.decodeStream(new BufferedInputStream((response2.getContent())));
         response2.disconnect();
+        Log.d("Time",String.valueOf(System.currentTimeMillis()-first));
         Log.d("getPic",String.valueOf(bm.getByteCount()));
         return bm;
     }

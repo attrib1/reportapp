@@ -55,6 +55,17 @@
             android:layout_marginRight="10dp"
             android:src="@drawable/ic_umbrella" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="asdasdasdasd"
+            android:id="@+id/typeText"
+            android:layout_alignTop="@+id/nameText"
+            android:layout_alignRight="@+id/typeImage"
+            android:layout_alignEnd="@+id/typeImage"
+            android:background="@android:drawable/dialog_holo_light_frame" />
+
     </RelativeLayout>
 
     <ImageView

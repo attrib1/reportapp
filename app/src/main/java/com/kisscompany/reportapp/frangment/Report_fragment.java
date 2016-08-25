@@ -47,6 +47,8 @@ import com.soundcloud.android.crop.Crop;
 import com.soundcloud.android.crop.CropImageActivity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -145,13 +147,21 @@ public class Report_fragment extends Fragment {
             options.inJustDecodeBounds = true;
             resultImage = BitmapFactory.decodeFile(path,options);
             // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options, 400, 400);
+            options.inSampleSize = calculateInSampleSize(options, 100, 100);
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
             resultImage = BitmapFactory.decodeFile(path,options);
             incident.setImageBitmap(resultImage);
             imID = data.getStringExtra("ImId");
-            File file = new File(path);
+            FileOutputStream file = null;
+            try {
+                file = new FileOutputStream(path);
+                resultImage.compress(Bitmap.CompressFormat.JPEG,100,file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            Log.d("imageSize",String.valueOf(new File(path).length()));
+           // File file = new File(path);
 
             getAddress();int res = getResources().getIdentifier(imID,"drawable",getActivity().getPackageName());
             typeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),res,null));
