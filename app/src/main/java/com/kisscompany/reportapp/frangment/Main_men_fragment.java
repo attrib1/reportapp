@@ -13,8 +13,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
@@ -28,7 +30,9 @@ import org.mortbay.jetty.Main;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,7 +84,8 @@ public class Main_men_fragment extends Fragment {
         };
         refresh.setOnRefreshListener(refreshListener);
         list = new ArrayList<PostClass>();
-        ListAdapter adapter = new NewFeed_Adapter(getActivity(),list);
+        Queue<Integer> v = new LinkedList<Integer>();
+        ListAdapter adapter = new NewFeed_Adapter(getActivity(),list,v);
         feed_list.setAdapter(adapter);
         feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
             @Override
@@ -149,6 +154,7 @@ public class Main_men_fragment extends Fragment {
 
         super.onPause();
     }
+
 
 
 }

@@ -14,6 +14,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -57,6 +58,7 @@ public class Camera extends AppCompatActivity {
     String color = null;
     String pic = null;
     ImageView inIm;
+    View currentType = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +73,9 @@ public class Camera extends AppCompatActivity {
             // everything else that doesn't update UI
             verifyStoragePermissions(this);
             Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            File dir =
+            File dir=
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-            output = new File(dir, "CameraContentDemo.jpeg");
+            output=new File(dir, "CameraContentDemo.jpeg");
             camera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
             startActivityForResult(camera,Cam_request);
         }
@@ -124,11 +126,11 @@ public class Camera extends AppCompatActivity {
         if (request_code == Crop.REQUEST_CROP&& result_code == CropImageActivity.RESULT_OK) {
 
 
-            try {
+          /*  try {
                 rotateImage(90);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            }
+            }*/
             WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             DisplayMetrics dm = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(dm);
@@ -139,42 +141,43 @@ public class Camera extends AppCompatActivity {
             BitmapFactory.decodeFile(output.getAbsolutePath(),options);
             options.inSampleSize = calculateInSampleSize(options, 400,400);
             options.inJustDecodeBounds = false;*/
-            Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath());
-            inIm.setImageBitmap(temp);
-            Log.d("ImageSize2",String.valueOf(output.length()));
-            Log.d("ImageSize2",String.valueOf(temp.getByteCount()));
+
+            inIm.setImageBitmap(BitmapFactory.decodeFile(output.getAbsolutePath()));
+
         }
         else if(request_code == Cam_request && result_code != RESULT_CANCELED){
-            /*String[] projection = new String[]{
-                    MediaStore.Images.ImageColumns._ID,
-                    MediaStore.Images.ImageColumns.DATA,
-                    MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
-                    MediaStore.Images.ImageColumns.DATE_TAKEN,
-                    MediaStore.Images.ImageColumns.MIME_TYPE
-            };
-            final Cursor cursor = getContentResolver()
-                    .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
-                            null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
 
-            // Put it in the image view
-            if (cursor.moveToFirst()) {
-                imageLocation = cursor.getString(1);
-                File imageFile = new File(imageLocation);
-                if (imageFile.exists()) {   // TODO: is there a better way to do this?
-                    inIm.setImageBitmap(BitmapFactory.decodeFile(imageLocation));
-                    Uri uri = Uri.fromFile(imageFile);
-                    Crop.of(uri,uri).asSquare().start(this);
-                }
-            }*/
+            ExifInterface ei = null;
+            try {
 
+                ei = new ExifInterface(output.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String exifOrientation = ei
+                    .getAttribute(ExifInterface.TAG_ORIENTATION);
+            Bitmap bitmap = BitmapFactory.decodeFile(output.getAbsolutePath());
+            switch(exifOrientation) {
+                case "6":
+                    bitmap = rotateImage(bitmap, 90);
+                    break;
+                case "3":
+                    bitmap =rotateImage(bitmap, 180);
+                    break;
+                case "8":
+                    bitmap = rotateImage(bitmap, 270);
+                    break;
+                default:
+                    break;
+            }
+            try {
+                FileOutputStream fileout = new FileOutputStream(output);
+                bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileout);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
-            Log.d("ImageSize",String.valueOf(output.length()));
-            //rotateImage(90);
-            //inIm.getLayoutParams().height = widthInDP;
-         /*   getFeedInfo feed = new getFeedInfo(inIm,this);
-            feed.execute("https://storage.googleapis.com/traffy_image/353086.png");*/
-
-
+           // Log.d("ImageSize",String.valueOf(output.length()));
         }
         else
         {
@@ -184,23 +187,26 @@ public class Camera extends AppCompatActivity {
 
 
     }
-
-
-    public void rotateImage(float angle) throws FileNotFoundException {
-        Bitmap temp = BitmapFactory.decodeFile(output.getAbsolutePath());
+    public static Bitmap rotateImage(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
-        FileOutputStream out = new FileOutputStream(output);
-        temp  = Bitmap.createBitmap(temp, 0, 0, temp.getWidth(), temp.getHeight(),matrix,true
-        );
-        temp.compress(Bitmap.CompressFormat.JPEG,100,out);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix,
+                true);
     }
+
+
+
 
     public void Click(View v)
     {
+        if(currentType!=null)
+            currentType.setBackgroundColor(0x00000000);
+        currentType = v;
+        v.setBackgroundColor(Color.parseColor("#000000"));
         switch(v.getId()){
             case R.id.type1:  color = "#4D00ff00";
                 typeText.setText("ปัญหา1");
+
                 break;
             case R.id.type2: color = "#4Dffff00";
                 typeText.setText("ปัญหา2");
@@ -285,7 +291,20 @@ public class Camera extends AppCompatActivity {
 
         return inSampleSize;
     }
-
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 
 
 }

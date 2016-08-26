@@ -49,7 +49,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
-
+import java.util.UUID;
 /**
  * Created by chanpc on 8/18/2016.
  */
@@ -100,6 +100,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             ///begin second phase
           /*  String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
             createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
+
             savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
             savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());*/
             savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
