@@ -55,6 +55,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         else{
             customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
             typeText = (TextView)customView.findViewById(R.id.typeText);
+            setType(getItem(position).getType());
             if(visibleQueue.size()!=0&&visibleQueue.contains(position)) {
                 typeText.setVisibility(View.VISIBLE);
                 Handler handle = new Handler();
@@ -111,7 +112,17 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             notifyDataSetChanged();
         };
     }
+    public void setType(String choose)
+    {
 
+        switch(choose){
+            case "ic_home_boom":typeText.setText("problem 1");break;
+            case "ic_heart":typeText.setText("prolem 2");break;
+            case "ic_car_crash":typeText.setText("problem 3");break;
+            case "ic_money":typeText.setText("problem 4");break;
+            case "ic_helicopter":typeText.setText("problem 5");break;
+        }
+    }
 
 }
 

@@ -87,7 +87,6 @@ public class Main_men_fragment extends Fragment {
         Queue<Integer> v = new LinkedList<Integer>();
         ListAdapter adapter = new NewFeed_Adapter(getActivity(),list,v);
         feed_list.setAdapter(adapter);
-        //feed_list.setOnClickListener(null);
         feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {

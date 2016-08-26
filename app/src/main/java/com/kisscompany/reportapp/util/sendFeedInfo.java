@@ -86,9 +86,9 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             output = new DataOutputStream(connection.getOutputStream());
             post.setOwner(LoginActivity.facebookName);
             post.setFacebookID(LoginActivity.userName);
-            UUID uniqueKey = UUID.randomUUID();
-            String picName = uniqueKey.toString();
-            output.writeBytes(getUrlParam(picName));
+            output.writeBytes(getUrlParam());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String picName = reader.readLine();
             output.flush();
             output.close();
           //  int res = connection.getResponseCode();
@@ -97,13 +97,12 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
          //   reader.close();
             ///end of first phase
             ///begin second phase
+          /*  UUID uniqueKey = UUID.randomUUID();
+            String picName = uniqueKey.toString();*/
 
+           /* String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
+            createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");*/
 
-          /*  String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
-            createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
-
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());*/
             savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
             savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
             mListener.onRefreshFinished();
@@ -116,14 +115,14 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         }
         return null;
     }
-    public String getUrlParam(String picName) throws IOException {
+    public String getUrlParam() throws IOException {
         String url =  "Name="+URLEncoder.encode(post.getOwner(),"UTF-8");
 
         url = url+"&Date="+String.valueOf(post.getDate())
                 +"&lat="+URLEncoder.encode(Main_menu.lat,"UTF-8")+"&lng="+URLEncoder.encode(Main_menu.lng,"UTF-8")+
         "&Comment="+URLEncoder.encode(post.getContent(),"UTF-8")+"&Address="+URLEncoder.encode(post.getAdress(),"UTF-8")+
                 "&Status="+URLEncoder.encode(post.getType(),"UTF-8")+
-        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8")+"&imageID="+URLEncoder.encode(picName,"UTF-8");
+        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8");
         Log.d("sendingParam",url);
         return url;
     }

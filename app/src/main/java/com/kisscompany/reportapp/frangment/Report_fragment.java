@@ -141,32 +141,7 @@ public class Report_fragment extends Fragment {
         Log.d("resultOk","OK");
         if(request_code == REQUEST && result_code == Activity.RESULT_OK)
         {
-            String path = data.getStringExtra("RESULT_STRING");
-
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            resultImage = BitmapFactory.decodeFile(path,options);
-            // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options, 100, 100);
-            // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
-            resultImage = BitmapFactory.decodeFile(path,options);
-            incident.setImageBitmap(resultImage);
-            imID = data.getStringExtra("ImId");
-            FileOutputStream file = null;
-            try {
-                file = new FileOutputStream(path);
-                resultImage.compress(Bitmap.CompressFormat.JPEG,100,file);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            Log.d("imageSize",String.valueOf(new File(path).length()));
-           // File file = new File(path);
-
-            getAddress();int res = getResources().getIdentifier(imID,"drawable",getActivity().getPackageName());
-            typeImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),res,null));
-            getDate();
-            color.setBackgroundColor(Color.parseColor(data.getStringExtra("Color")));
+            setCurrentTab(0);
 
         }
         else if(request_code == REQUEST && result_code == 10)
@@ -176,7 +151,7 @@ public class Report_fragment extends Fragment {
             Log.d("resultCancel","OK");
         }
         else{
-            Log.d("eventCancel","cancel");
+            setCurrentTab(0);
         }
 
 

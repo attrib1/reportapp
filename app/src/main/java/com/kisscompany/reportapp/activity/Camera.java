@@ -2,6 +2,7 @@ package com.kisscompany.reportapp.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -19,12 +20,14 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -32,7 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
+import com.kisscompany.reportapp.util.sendFeedInfo;
 import com.kisscompany.reportapp.util.uploadImageGoogle;
 import com.soundcloud.android.crop.Crop;
 import com.soundcloud.android.crop.CropImageActivity;
@@ -41,6 +46,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,16 +56,18 @@ public class Camera extends AppCompatActivity {
 
     String imageLocation;
     int widthInDP;
-    TextView send,typeText;
+    TextView send,typeText,cancel;
     File output;
-    ImageView reTake;
     ImageView colorTab;
     HorizontalScrollView scroll;
     static final int Cam_request = 1;
     String color = null;
     String pic = null;
     ImageView inIm;
+    TextView info;
+    ProgressDialog progress;
     View currentType = null;
+    Bitmap resultImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,42 +90,43 @@ public class Camera extends AppCompatActivity {
         }
         scroll = (HorizontalScrollView)findViewById(R.id.Actype);
         send = (TextView)findViewById(R.id.sendTxt);
-        colorTab = (ImageView)findViewById(R.id.colorTab);
         inIm = (ImageView)findViewById(R.id.tempImg);
-        typeText = (TextView)findViewById(R.id.typeTxt);
-        reTake = (ImageView)findViewById(R.id.reTake);
-
-
-
-
-        reTake.setOnClickListener(new View.OnClickListener() {
+        info = (TextView)findViewById(R.id.infoText);
+        cancel = (TextView)findViewById(R.id.cancelButt);
+        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Intent intent = new Intent();
-                setResult(10);
+                setResult(RESULT_CANCELED);
                 finish();
             }
         });
 
-
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(color!=null) {
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("RESULT_STRING", output.getAbsolutePath());
-                    resultIntent.putExtra("Color", color);
-                    resultIntent.putExtra("ImId",pic);
-                    setResult(RESULT_OK, resultIntent);
-                    Log.d("resultOk1","ok");
-                    finish();
+                if (pic != null) {
+                    progress = new ProgressDialog(Camera.this);
+                    Upload();
+                    PostClass sendPost = createPost();
+                    sendFeedInfo send = new sendFeedInfo(sendPost, Camera.this);
+                    send.setCustomEventListener(new sendFeedInfo.OnRefreshFinishListener() {
+                        @Override
+                        public void onRefreshFinished() {
+                            progress.dismiss();
+                            setResult(RESULT_OK);
+                            finish();
+
+                        }
+                    });
+                    send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
+                    Toast.makeText(Camera.this, "Done posting", Toast.LENGTH_SHORT).show();
                 }
                 else
-                {
-                    Toast.makeText(Camera.this,"Please choose incident type",Toast.LENGTH_SHORT).show();
-                }
+                    Toast.makeText(Camera.this,"เลือกประเภทปัญหา",Toast.LENGTH_SHORT).show();
             }
+
         });
+
 
     }
     @Override
@@ -125,24 +135,18 @@ public class Camera extends AppCompatActivity {
 
         if (request_code == Crop.REQUEST_CROP&& result_code == CropImageActivity.RESULT_OK) {
 
-
-          /*  try {
-                rotateImage(90);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
             WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             DisplayMetrics dm = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(dm);
             widthInDP = Math.round(dm.widthPixels);
             inIm.getLayoutParams().height = widthInDP;
-           /* final BitmapFactory.Options options = new BitmapFactory.Options();
+            final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(output.getAbsolutePath(),options);
             options.inSampleSize = calculateInSampleSize(options, 400,400);
-            options.inJustDecodeBounds = false;*/
-
-            inIm.setImageBitmap(BitmapFactory.decodeFile(output.getAbsolutePath()));
+            options.inJustDecodeBounds = false;
+            resultImage = BitmapFactory.decodeFile(output.getAbsolutePath(),options);
+            inIm.setImageBitmap(resultImage);
 
         }
         else if(request_code == Cam_request && result_code != RESULT_CANCELED){
@@ -181,6 +185,7 @@ public class Camera extends AppCompatActivity {
         }
         else
         {
+            Log.d("cancel","cancel");
             setResult(RESULT_CANCELED);
             finish();
         }
@@ -202,30 +207,9 @@ public class Camera extends AppCompatActivity {
         if(currentType!=null)
             currentType.setBackgroundColor(0x00000000);
         currentType = v;
-        v.setBackgroundColor(Color.parseColor("#000000"));
-        switch(v.getId()){
-            case R.id.type1:  color = "#4D00ff00";
-                typeText.setText("ปัญหา1");
-
-                break;
-            case R.id.type2: color = "#4Dffff00";
-                typeText.setText("ปัญหา2");
-                break;
-            case R.id.type3: color = "#4Dafff00";
-                typeText.setText("ปัญหา3");
-                break;
-            case R.id.type4: color = "#4Dca1265";
-                typeText.setText("ปัญหา4");
-                break;
-            case R.id.type5: color = "#4Dfcfa00";
-                typeText.setText("ปัญหา5");
-                break;
-            case R.id.type6: color = "#4Da0fb00";
-                typeText.setText("ปัญหา6");
-                break;
-        }
+        v.setBackgroundColor(Color.parseColor("#4Da8a8a8"));
         pic = v.getTag().toString();
-        colorTab.setBackgroundColor(Color.parseColor(color));
+
        // typeText.setText(v.getTag().toString());
 
 
@@ -291,7 +275,68 @@ public class Camera extends AppCompatActivity {
 
         return inSampleSize;
     }
- 
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    public void Upload()
+    {
+        progress.setCancelable(false);
+        progress.setMessage("Uploading ...");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setProgress(0);
+        progress.setMax(100);
+        progress.show();
+    }
+    public PostClass createPost()
+    {
+        PostClass newPost = new PostClass(resultImage,getDate() ,getAddress(),info.getText().toString(),"ID5580907",pic);
 
+        return newPost;
+    }
+    public String getDate()
+    {
+        Date currentDateTime = new Date(); //get date and time2
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(currentDateTime);
+    }
+    public String getAddress()
+    {
+        double long1,lati1;
+        lati1 = Double.parseDouble(Main_menu.lat);
+        long1 = Double.parseDouble(Main_menu.lng);
+        if(lati1>0 && long1>0)
+        {
+            Geocoder geocode = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses;
+
+            try {
+                addresses = geocode.getFromLocation(lati1,long1, 1);
+
+                String Addres_ = addresses.get(0).getAddressLine(0);
+                String Country = addresses.get(0).getCountryName();
+                String City = addresses.get(0).getAdminArea();
+                String street = addresses.get(0).getPostalCode();
+                String df = addresses.get(0).getLocality();
+                String af = addresses.get(0).getSubLocality();
+                return (Addres_+" "+af+" "+df+" "+City+" "+street);
+
+
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }//if closing. . .
+        else
+        {
+            Toast.makeText(this, "No Vlaue", Toast.LENGTH_LONG).show();
+            return null;
+        }
+
+    return null;
+    }
 
 }

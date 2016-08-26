@@ -36,25 +36,15 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tempImg"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/toolbar3" />
-
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:id="@+id/Actype"
 
         android:fillViewport="false"
-        android:layout_alignLeft="@+id/tempImg"
-        android:layout_alignStart="@+id/tempImg"
-        android:layout_above="@+id/relativeLayout"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/toolbar3"
+        android:layout_alignParentStart="true">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,82 +56,91 @@
                 android:id="@+id/type1"
                 android:tag="ic_money"
                 android:src="@drawable/ic_money"
-                android:onClick="Click" />
+                android:onClick="Click"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
+                android:padding="5dp" />
 
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:tag="ic_heart"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="0dp"
                 android:id="@+id/type2"
 
                 android:src="@drawable/ic_heart"
-                android:onClick="Click" />
+                android:onClick="Click"
+                android:padding="5dp" />
 
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
                 android:id="@+id/type3"
                 android:tag="ice_home_boom"
                 android:src="@drawable/ice_home_boom"
-                android:onClick="Click" />
+                android:onClick="Click"
+                android:padding="5dp" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:tag="ic_umbrella"
-                android:layout_marginLeft="10dp"
                 android:id="@+id/type4"
                 android:src="@drawable/ic_umbrella"
                 android:nestedScrollingEnabled="false"
-                android:onClick="Click" />
+                android:onClick="Click"
+                android:padding="5dp" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
                 android:tag="ic_helicopter"
                 android:id="@+id/type5"
                 android:src="@drawable/ic_helicopter"
-                android:onClick="Click" />
+                android:onClick="Click"
+                android:padding="5dp" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
                 android:id="@+id/type6"
                 android:tag="ic_car_crash"
                 android:src="@drawable/ic_car_crash"
+                android:padding="5dp"
                 android:onClick="Click" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:tag="type7"
-                android:layout_marginLeft="10dp"
+                android:padding="5dp"
                 android:id="@+id/imageView10"
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:tag="type8"
-                android:layout_marginLeft="10dp"
+                android:padding="5dp"
                 android:id="@+id/imageView11"
                 android:src="@drawable/ice_home_boom" />
             <ImageView
                 android:layout_width="60dp"
                 android:tag="type9"
                 android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
+                android:padding="5dp"
                 android:id="@+id/imageView12"
                 android:src="@drawable/ice_home_boom" />
         </LinearLayout>
         </HorizontalScrollView>
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+
+
+        android:id="@+id/relativeLayout"
         android:layout_alignParentBottom="true"
-
-
-        android:id="@+id/relativeLayout">
+        android:layout_alignLeft="@+id/Actype"
+        android:layout_alignStart="@+id/Actype">
 
         <TextView
             android:layout_width="wrap_content"
@@ -152,45 +151,56 @@
             android:paddingBottom="10dp"
             android:paddingRight="10dp"
 
-            android:textColor="@color/colorPrimaryDark"
             android:id="@+id/sendTxt"
             android:textSize="20dp" />
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/reTake"
-            android:paddingLeft="10dp"
+            android:text="cancel"
+            android:id="@+id/cancelButt"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp"
+            android:textSize="20dp"
             android:layout_alignParentBottom="true"
-            android:paddingBottom="10dp"
-            android:src="@drawable/ic_re" />
+            android:layout_alignTop="@+id/sendTxt" />
+
     </RelativeLayout>
 
-    <TextView
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Type : "
-        android:id="@+id/textView2"
-        android:layout_above="@+id/Actype"
-        android:layout_alignLeft="@+id/tempImg"
-        android:layout_alignStart="@+id/tempImg"
+        android:id="@+id/scrollView"
+        android:layout_below="@+id/Actype"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/relativeLayout">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
 
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp" />
+            android:id="@+id/relativeLayout2"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/typeTxt"
-        android:layout_alignTop="@+id/textView2"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2" />
+       >
 
-    <ImageView
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tempImg"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+    <EditText
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:id="@+id/colorTab"
-        android:layout_alignTop="@+id/tempImg"
-        android:layout_centerHorizontal="true" />>
+        android:layout_height="wrap_content"
+        android:id="@+id/infoText"
+        android:layout_below="@+id/tempImg"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_above="@+id/relativeLayout" />
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>
