@@ -46,8 +46,9 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
     public View getView(final int position, View convertView, ViewGroup parent)
     {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        
+
         View customView;
+
         if(getItem(position) ==null) {
             customView= inflater.inflate(R.layout.loading_layout,parent,false);
         }
@@ -92,7 +93,8 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             name.setText(getItem(position).getOwner());
         }
 
-
+        customView.setEnabled(false);
+       customView.setOnClickListener(null);
         return  customView;
     }
     class MyAsyncTask extends AsyncTask<Integer, String, String> {

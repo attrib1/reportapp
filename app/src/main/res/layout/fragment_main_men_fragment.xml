@@ -42,6 +42,9 @@
     </android.support.v7.widget.Toolbar>
 
     <ListView
+        android:clickable="false"
+        android:listSelector="@android:color/transparent"
+        android:focusable="false" android:focusableInTouchMode="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newFeedList"

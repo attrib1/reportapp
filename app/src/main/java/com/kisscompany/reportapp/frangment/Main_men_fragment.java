@@ -87,6 +87,7 @@ public class Main_men_fragment extends Fragment {
         Queue<Integer> v = new LinkedList<Integer>();
         ListAdapter adapter = new NewFeed_Adapter(getActivity(),list,v);
         feed_list.setAdapter(adapter);
+        //feed_list.setOnClickListener(null);
         feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -111,6 +112,7 @@ public class Main_men_fragment extends Fragment {
                     if(flag_loading == false)
                     {
                         flag_loading = true;
+
                         Log.d("newItem","new");
                             Thread t = new Thread(new Runnable() {
                                 @Override
@@ -140,6 +142,8 @@ public class Main_men_fragment extends Fragment {
                 refreshListener.onRefresh();
             }
         });
+        feed_list.setSmoothScrollbarEnabled(true);
+
         return customView;
     }
     @Override

@@ -86,18 +86,19 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             output = new DataOutputStream(connection.getOutputStream());
             post.setOwner(LoginActivity.facebookName);
             post.setFacebookID(LoginActivity.userName);
-            output.writeBytes(getUrlParam());
+            UUID uniqueKey = UUID.randomUUID();
+            String picName = uniqueKey.toString();
+            output.writeBytes(getUrlParam(picName));
             output.flush();
             output.close();
           //  int res = connection.getResponseCode();
             //Log.d("SendingCode",String.valueOf(res));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));//get feedback picName
-            String picName = reader.readLine();
-            Log.d("Picname",picName);
             connection.disconnect();
          //   reader.close();
             ///end of first phase
             ///begin second phase
+
+
           /*  String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
             createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
 
@@ -115,14 +116,14 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         }
         return null;
     }
-    public String getUrlParam() throws IOException {
+    public String getUrlParam(String picName) throws IOException {
         String url =  "Name="+URLEncoder.encode(post.getOwner(),"UTF-8");
 
         url = url+"&Date="+String.valueOf(post.getDate())
                 +"&lat="+URLEncoder.encode(Main_menu.lat,"UTF-8")+"&lng="+URLEncoder.encode(Main_menu.lng,"UTF-8")+
         "&Comment="+URLEncoder.encode(post.getContent(),"UTF-8")+"&Address="+URLEncoder.encode(post.getAdress(),"UTF-8")+
                 "&Status="+URLEncoder.encode(post.getType(),"UTF-8")+
-        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8")+"&";
+        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8")+"&imageID="+URLEncoder.encode(picName,"UTF-8");
         Log.d("sendingParam",url);
         return url;
     }

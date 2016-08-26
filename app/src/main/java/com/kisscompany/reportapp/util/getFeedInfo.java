@@ -188,14 +188,13 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         }
         index = index +5;
         posts.add(null);
-        final int finalEraseIndex = eraseIndex;
+        if(eraseIndex!=-1)
+            posts.remove(eraseIndex);
         act.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 NewFeed_Adapter feedadapter = (NewFeed_Adapter)listV.getAdapter();
                 if(feedadapter!=null) {
-                    if(finalEraseIndex!=-1)
-                         posts.remove(finalEraseIndex);
                     feedadapter.notifyDataSetChanged();
                 }
                 if(index >= JArray.length())
