@@ -5,6 +5,8 @@
     <string name="frag3String">Frangment 3</string>
     <string name="frag4String">Frangment 4</string>
     <string name="facebook_app_id">932083816937242</string>
+    <string name="drawer_open">drawer open</string>
+    <string name="drawer_close">drawer close</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

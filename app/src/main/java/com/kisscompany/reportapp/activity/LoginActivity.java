@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -49,12 +50,21 @@ public class LoginActivity extends AppCompatActivity {
     public static String userName;
     public static String facebookName;
     public static HttpRequestFactory requestFactory;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("cancel","cancel10");
         FacebookSdk.sdkInitialize(getApplicationContext());
-        Log.d("cancel","cancel9");
+        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
+                Bundle params = new Bundle();
+                params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
+                setFaceBookInfo(newAccessToken,params);
+            }
+        };
         setContentView(R.layout.activity_login);
         Log.d("cancel","cancel8");
         callbackManager = CallbackManager.Factory.create();
@@ -74,38 +84,9 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("cancel","cancel3");
                 Bundle params = new Bundle();
                 params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
-                new GraphRequest(AccessToken.getCurrentAccessToken(), "me", params, HttpMethod.GET,
-                        new GraphRequest.Callback() {
-                            @Override
-                            public void onCompleted(GraphResponse response) {
-                                if (response != null) {
-                                    try {
-                                        JSONObject data = response.getJSONObject();
-                                        Log.d("MyName",data.toString());
-                                        if (data.has("picture")) {
-                                            String temp = data.getJSONObject("picture").getJSONObject("data").getString("url");
-                                            // set profile image to imageview using Picasso or Native methods
-                                            profilePicUrl = temp;
-                                        }
-                                        if(data.has("id"))
-                                        {
-                                            userName = data.getString("id");
-                                            Log.d("id",userName);
-                                        }
-                                        if(data.has("name"))
-                                        {
-                                            facebookName = data.getString("name");
-                                            Log.d("username",facebookName);
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }).executeAsync();
+                setFaceBookInfo(AccessToken.getCurrentAccessToken(),params);
 
-                Intent intent = new Intent(LoginActivity.this,Main_menu.class);
-                startActivity(intent);
+
             }
 
             @Override
@@ -167,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
         return tempFile; }
     @Override
     public void onPause(){
-        LoginManager.getInstance().logOut();
+       // LoginManager.getInstance().logOut();
         super.onPause();
     }
     public boolean isLoggedIn() {
@@ -184,5 +165,39 @@ public class LoginActivity extends AppCompatActivity {
 
             return false;
         }
+    }
+    public void setFaceBookInfo(AccessToken acces,Bundle params)
+    {
+        new GraphRequest(acces, "me", params, HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+                        if (response != null) {
+                            try {
+                                JSONObject data = response.getJSONObject();
+                                Log.d("MyName",data.toString());
+                                if (data.has("picture")) {
+                                    String temp = data.getJSONObject("picture").getJSONObject("data").getString("url");
+                                    // set profile image to imageview using Picasso or Native methods
+                                    profilePicUrl = temp;
+                                }
+                                if(data.has("id"))
+                                {
+                                    userName = data.getString("id");
+                                    Log.d("id",userName);
+                                }
+                                if(data.has("name"))
+                                {
+                                    facebookName = data.getString("name");
+                                    Log.d("username",facebookName);
+                                }
+                                Intent intent = new Intent(LoginActivity.this,Main_menu.class);
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }).executeAsync();
     }
 }

@@ -25,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -68,6 +69,8 @@ public class Camera extends AppCompatActivity {
     ProgressDialog progress;
     View currentType = null;
     Bitmap resultImage;
+    final String CLIENT_ID = "CWIB5QARTPRLLQIVCYKM5MVXYSQCRGYM1VZ31AJ4DCIMKEJ";
+    final String CLIENT_SECRET = "4SDDGS3PYQ5JQOX4WU0XJTXAKH1HSHEFQ1I21V4KHDR15PG";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,9 +92,17 @@ public class Camera extends AppCompatActivity {
             startActivityForResult(camera,Cam_request);
         }
         scroll = (HorizontalScrollView)findViewById(R.id.Actype);
+        scroll.requestFocus();
         send = (TextView)findViewById(R.id.sendTxt);
         inIm = (ImageView)findViewById(R.id.tempImg);
         info = (TextView)findViewById(R.id.infoText);
+        info.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                info.setText("");
+                return false;
+            }
+        });
         cancel = (TextView)findViewById(R.id.cancelButt);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,8 +297,8 @@ public class Camera extends AppCompatActivity {
         progress.setCancelable(false);
         progress.setMessage("Uploading ...");
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setProgress(0);
-        progress.setMax(100);
+        //progress.setProgress(0);
+        //progress.setMax(100);
         progress.show();
     }
     public PostClass createPost()

@@ -150,7 +150,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         response.disconnect();
 
     }
-    public Bitmap getProfilePic() throws IOException {
+    public static Bitmap getProfilePic() throws IOException {
         URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
        // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
         final BitmapFactory.Options options = new BitmapFactory.Options();

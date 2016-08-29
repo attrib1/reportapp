@@ -176,6 +176,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             //int like = JObject.getInt("like");
             String content = JObject.getString("comment");
             String stat = JObject.getString("status");
+            Log.d("stat",stat);
             String time = JObject.getString("time_stamp");
             String faceBook = JObject.getString("facebook_id");
             String address = JObject.getString("address");

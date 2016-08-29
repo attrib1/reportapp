@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -22,19 +23,28 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -47,7 +57,11 @@ import com.kisscompany.reportapp.frangment.Noti_fragment;
 import com.kisscompany.reportapp.frangment.Report_fragment;
 import com.kisscompany.reportapp.frangment.call_fragment;
 import com.kisscompany.reportapp.frangment.twitt_fragment;
+import com.kisscompany.reportapp.util.sendFeedInfo;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -56,6 +70,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         , GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     View v,v2,v3,v4,v5,v6;
+    DrawerLayout drawer;
+    ActionBarDrawerToggle toggle;
     public static String locaText = null;
     private GoogleApiClient googleApiClient;
     private LocationAvailability locationAvailability;
@@ -63,15 +79,60 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     private LocationRequest locationRequest;
     public static String lat="",lng="";
     private boolean gps = true;
+    ListView drawerList;
+    ImageView avatar;
     private FragmentTabHost tabHost;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+        Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
+        //setSupportActionBar(tool);
 
         buildGoogleApiClient();//connect GPS
         googleApiClient.connect();
 
+        drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
+        avatar = (ImageView)findViewById(R.id.avatar);
+        Thread t=  new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setProfilePic();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+        TextView name = (TextView)findViewById(R.id.userName);
+        name.setText(LoginActivity.facebookName);
+        drawer.setClickable(true);
+
+        drawerList = (ListView)findViewById(R.id.navList);
+        String[] list = {"Logout"};
+        ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
+        drawerList.setAdapter(adapter);
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LoginManager.getInstance().logOut();
+                finish();
+            }
+        });
+                toggle = new ActionBarDrawerToggle(this, drawer, tool, R.string.drawer_open, R.string.drawer_close) {
+                    @Override
+                    public void onDrawerOpened(View view) {
+
+                        invalidateOptionsMenu();
+
+                    }
+
+                    public void onDrawerClosed(View view) {
+                        invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                    }
+                };
+        drawer.addDrawerListener(toggle);
         tabHost = (FragmentTabHost)findViewById(R.id.tab);/////////////////create tab host
         tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
         Resources res = getResources();
@@ -268,6 +329,12 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         Log.d("Destroyed","end");
         super.onDestroy();
     }
+    @Override
+    protected void onPostCreate(Bundle saveInstant)
+    {
+        super.onPostCreate(saveInstant);
+        toggle.syncState();
+    }
    /* @Override
     protected void onActivityResult(int request_code,int result_code,Intent data)
     {
@@ -276,5 +343,21 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             gps = getLocationConnect();
         }
     }*/
+    public void setProfilePic() throws IOException {
+        URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
+        // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
+        options.inSampleSize = Camera.calculateInSampleSize(options, 100,100);
+        options.inJustDecodeBounds = false;
+        final Bitmap temp = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                avatar.setImageBitmap(temp);
+            }
+        });
 
+    }
 }

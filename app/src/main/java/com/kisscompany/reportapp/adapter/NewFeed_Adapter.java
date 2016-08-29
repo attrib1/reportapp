@@ -54,33 +54,20 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         }
         else{
             customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
-            typeText = (TextView)customView.findViewById(R.id.typeText);
+            typeText = (TextView)customView.findViewById(R.id.typeText);///impliment click to hide text
+            typeText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    visibleQueue.add(position);
+                }
+            });
             setType(getItem(position).getType());
-            if(visibleQueue.size()!=0&&visibleQueue.contains(position)) {
-                typeText.setVisibility(View.VISIBLE);
-                Handler handle = new Handler();
-                handle.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        new MyAsyncTask().execute(position);
-                    }
-                },2000);
-
-                //visibleQueue.poll();
-            }
             profile = (ImageView)customView.findViewById(R.id.profile);
             profile.setImageBitmap(getItem(position).getProfilePic());
             incident = (ImageView)customView.findViewById(R.id.incident);
             incident.getLayoutParams().height = widthInDP;
-            typeImg = (ImageView)customView.findViewById(R.id.typeImage);
-            typeImg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    visibleQueue.add(position);
-                    notifyDataSetChanged();
-
-                }
-            });
+            typeImg = (ImageView)customView.findViewById(R.id.typeImage);///impliment click to hide image
+            Log.d("debug",getItem(position).getType());
             int res = con.getResources().getIdentifier(getItem(position).getType(),"drawable", getContext().getPackageName());
             typeImg.setImageDrawable(ResourcesCompat.getDrawable(con.getResources(),res,null));
             incident.setImageBitmap(getItem(position).getPic());

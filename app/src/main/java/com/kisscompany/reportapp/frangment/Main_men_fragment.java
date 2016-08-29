@@ -6,7 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -40,6 +43,8 @@ import java.util.Queue;
 public class Main_men_fragment extends Fragment {
 
     ListView feed_list;
+    DrawerLayout drawer;
+    ActionBarDrawerToggle toggle;
     SwipeRefreshLayout refresh;
     ArrayList<PostClass> list;
     getFeedInfo feedInfo;
@@ -56,6 +61,7 @@ public class Main_men_fragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View customView = inflater.inflate(R.layout.fragment_main_men_fragment,container,false);
+
         refresh = (SwipeRefreshLayout)customView.findViewById(R.id.main_swipe);////refresh bar
         //refresh.setRefreshing(false);
         feed_list = (ListView)customView.findViewById(R.id.newFeedList);
