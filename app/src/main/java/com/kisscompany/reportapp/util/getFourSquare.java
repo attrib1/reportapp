@@ -1,11 +1,15 @@
 package com.kisscompany.reportapp.util;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.graphics.Camera;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.Spinner;
+
+import com.kisscompany.reportapp.adapter.LocationAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,12 +27,10 @@ import java.util.ArrayList;
  */
 public class getFourSquare extends AsyncTask<String,String,String> {
 
-    Spinner spin;
     ArrayList<FoursquareVenue> venues;
-    Activity activity;
-    public getFourSquare(Activity activity, Spinner spin)
+    ListActivity activity;
+    public getFourSquare(ListActivity activity)
     {
-        this.spin = spin;
         this.activity = activity;
     }
     @Override
@@ -46,6 +48,7 @@ public class getFourSquare extends AsyncTask<String,String,String> {
             {
                 buff.append(line);
             }
+            Log.d("buff",buff.toString());
             venues = parseFoursquare(buff.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -68,7 +71,8 @@ public class getFourSquare extends AsyncTask<String,String,String> {
     @Override
     public void onPostExecute(String result)
     {
-        ListAdapter adapter = new ArrayAdapter<String>(activity.get,android.R.layout.simple_spinner_dropdown_item,venues);
+        ListAdapter adapter = new LocationAdapter(activity,venues);
+        activity.setListAdapter(adapter);
     }
     private static ArrayList parseFoursquare(final String response) {
 
@@ -87,9 +91,14 @@ public class getFourSquare extends AsyncTask<String,String,String> {
                         JSONObject currentJSON = jsonArray.getJSONObject(i);
                         FoursquareVenue venue = new FoursquareVenue();
                         venue.setName(currentJSON.getString("name"));
-                        venue.setCity(currentJSON.getString("city"));
-                        venue.setCountry(currentJSON.getString("country"));
+                        currentJSON = currentJSON.getJSONObject("location");
+                        if(currentJSON.has("city"))
+                            venue.setCity(currentJSON.getString("city"));
+                        if(currentJSON.has("country"))
+                            venue.setCountry(currentJSON.getString("country"));
+                        if(currentJSON.has("postalCode"))
                         venue.setPostal(currentJSON.getString("postalCode"));
+                        if(currentJSON.has("state"))
                         venue.setState(currentJSON.getString("state"));
                         temp.add(venue);
                     }

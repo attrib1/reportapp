@@ -4,12 +4,12 @@ package com.kisscompany.reportapp.util;
  * Created by chanpc on 8/29/2016.
  */
 public class FoursquareVenue {
-    private String name;
-    private String city;
-    private String postal;
-    private String category;
-    private String state;
-    private String country;
+    private String name="";
+    private String city="";
+    private String postal="";
+    private String category="";
+    private String state="";
+    private String country="";
     public FoursquareVenue() {
         this.name = "";
         this.city = "";
