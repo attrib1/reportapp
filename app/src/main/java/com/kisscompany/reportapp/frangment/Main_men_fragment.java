@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
@@ -59,6 +60,7 @@ public class Main_men_fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Main_menu.title.setText("New Feeds");
         // Inflate the layout for this fragment
         View customView = inflater.inflate(R.layout.fragment_main_men_fragment,container,false);
 
@@ -141,12 +143,12 @@ public class Main_men_fragment extends Fragment {
             }
         });
 
-        refresh.post(new Runnable() {
+      /*  refresh.post(new Runnable() {
             @Override public void run() {
                 refresh.setRefreshing(true);
                 refreshListener.onRefresh();
             }
-        });
+        });*/
         feed_list.setSmoothScrollbarEnabled(true);
 
         return customView;
@@ -162,6 +164,16 @@ public class Main_men_fragment extends Fragment {
         }
 
         super.onPause();
+    }
+    @Override
+    public void onResume(){
+        refresh.post(new Runnable() {
+            @Override public void run() {
+                refresh.setRefreshing(true);
+                refreshListener.onRefresh();
+            }
+        });
+        super.onResume();
     }
 
 

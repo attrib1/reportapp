@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.util.getFeedInfo;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
@@ -80,6 +81,7 @@ public class twitt_fragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Main_menu.title.setText("Twitter");
         twitterView = inflater.inflate(R.layout.fragment_twitt_fragment, container, false);
         // Inflate the layout for this fragment
         swipe = (SwipeRefreshLayout)twitterView.findViewById(R.id.twitter_swipe);///doing swipe to update function

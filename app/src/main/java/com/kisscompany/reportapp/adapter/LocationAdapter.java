@@ -19,7 +19,7 @@ import java.util.List;
  * Created by chanpc on 8/29/2016.
  */
 public class LocationAdapter extends ArrayAdapter<FoursquareVenue> {
-    TextView name,city,state,country,postal;
+    TextView name,locate;
     public LocationAdapter(Context context, List<FoursquareVenue> list) {
         super(context, R.layout.location_layout,list);
 
@@ -31,17 +31,19 @@ public class LocationAdapter extends ArrayAdapter<FoursquareVenue> {
         View customView = inflater.inflate(R.layout.location_layout,parent,false);
 
         name = (TextView)customView.findViewById(R.id.name);
-        city = (TextView)customView.findViewById(R.id.city);
-        state = (TextView)customView.findViewById(R.id.state);
-        postal = (TextView)customView.findViewById(R.id.postal);
-        country = (TextView)customView.findViewById(R.id.country);
+        locate = (TextView)customView.findViewById(R.id.locate);
 
         name.setText(getItem(position).getName());
-        city.setText(getItem(position).getCity());
-        state.setText(getItem(position).getState());
-        country.setText(getItem(position).getCountry());
-        postal.setText(getItem(position).getPostal());
-
+        String location = "";
+        if(getItem(position).getState().length() > 0)
+            location = location + getItem(position).getState()+" ";
+        if(getItem(position).getCity().length() > 0)
+            location = location + getItem(position).getCity()+" ";
+        if(getItem(position).getPostal().length() > 0)
+            location = location + getItem(position).getPostal()+" ";
+        if(getItem(position).getCountry().length() > 0)
+            location = location + getItem(position).getCountry()+" ";
+        locate.setText(location);
 
         return  customView;
     }

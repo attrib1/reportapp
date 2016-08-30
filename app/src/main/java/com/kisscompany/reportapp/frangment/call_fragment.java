@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.activity.number_Activity;
 import com.kisscompany.reportapp.adapter.categoryAdapter;
 import com.kisscompany.reportapp.util.Category;
@@ -44,6 +45,7 @@ public class call_fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Main_menu.title.setText("เบอร์ดทรฉุกเฉิน ");
         categoryView = inflater.inflate(R.layout.fragment_call_fragment, container, false);
         catListView = (ListView) categoryView.findViewById(R.id.catList);
         ((TextView)categoryView.findViewById(R.id.main_toolbar_title)).setText("Call");

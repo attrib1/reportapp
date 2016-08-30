@@ -65,16 +65,19 @@ public class Camera extends AppCompatActivity {
     String color = null;
     String pic = null;
     ImageView inIm;
-    TextView info;
+    TextView info,chooseLocation;
     ProgressDialog progress;
     View currentType = null;
     Bitmap resultImage;
+    final int LOCATION_REQUEST = 3;
     final String CLIENT_ID = "CWIB5QARTPRLLQIVCYKM5MVXYSQCRGYM1VZ31AJ4DCIMKEJ";
     final String CLIENT_SECRET = "4SDDGS3PYQ5JQOX4WU0XJTXAKH1HSHEFQ1I21V4KHDR15PG";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera2);
+
+        Main_menu.title.setText("เลือกประเภท");
 
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
@@ -93,6 +96,14 @@ public class Camera extends AppCompatActivity {
         }
         scroll = (HorizontalScrollView)findViewById(R.id.Actype);
         scroll.requestFocus();
+        chooseLocation = (TextView)findViewById(R.id.chooseLocation);
+        chooseLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =  new Intent(Camera.this,chooseLocation.class);
+                startActivityForResult(intent,LOCATION_REQUEST);
+            }
+        });
         send = (TextView)findViewById(R.id.sendTxt);
         inIm = (ImageView)findViewById(R.id.tempImg);
         info = (TextView)findViewById(R.id.infoText);
@@ -195,6 +206,21 @@ public class Camera extends AppCompatActivity {
             }
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
            // Log.d("ImageSize",String.valueOf(output.length()));
+        }
+        else if(request_code == LOCATION_REQUEST && result_code ==RESULT_OK)
+        {
+            Bundle bundle = data.getBundleExtra("location");
+            String location = bundle.getString("name")+"\n";
+            if(bundle.getString("state").length() > 0)
+                location = location + bundle.getString("state")+" ";
+            if(bundle.getString("city").length() > 0)
+                location = location + bundle.getString("city")+" ";
+            if(bundle.getString("postal").length() > 0)
+                location = location + bundle.getString("postal")+" ";
+            if(bundle.getString("country").length() > 0)
+                location = location + bundle.getString("country")+" ";
+            chooseLocation.setText(location);
+
         }
         else
         {
@@ -305,7 +331,7 @@ public class Camera extends AppCompatActivity {
     }
     public PostClass createPost()
     {
-        PostClass newPost = new PostClass(resultImage,getDate() ,getAddress(),info.getText().toString(),"ID5580907",pic);
+        PostClass newPost = new PostClass(resultImage,getDate() ,chooseLocation.getText().toString(),info.getText().toString(),"ID5580907",pic);
 
         return newPost;
     }
@@ -315,41 +341,6 @@ public class Camera extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(currentDateTime);
     }
-    public String getAddress()
-    {
-        double long1,lati1;
-        lati1 = Double.parseDouble(Main_menu.lat);
-        long1 = Double.parseDouble(Main_menu.lng);
-        if(lati1>0 && long1>0)
-        {
-            Geocoder geocode = new Geocoder(this, Locale.getDefault());
-            List<Address> addresses;
 
-            try {
-                addresses = geocode.getFromLocation(lati1,long1, 1);
-
-                String Addres_ = addresses.get(0).getAddressLine(0);
-                String Country = addresses.get(0).getCountryName();
-                String City = addresses.get(0).getAdminArea();
-                String street = addresses.get(0).getPostalCode();
-                String df = addresses.get(0).getLocality();
-                String af = addresses.get(0).getSubLocality();
-                return (Addres_+" "+af+" "+df+" "+City+" "+street);
-
-
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }//if closing. . .
-        else
-        {
-            Toast.makeText(this, "No Vlaue", Toast.LENGTH_LONG).show();
-            return null;
-        }
-
-    return null;
-    }
 
 }

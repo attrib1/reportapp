@@ -178,7 +178,7 @@
         android:layout_above="@+id/relativeLayout">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
 
             android:id="@+id/relativeLayout2"
 
@@ -186,22 +186,34 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:id="@+id/tempImg"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/infoText"
-        android:layout_below="@+id/tempImg"
-        android:layout_centerHorizontal="true"
-        android:hint="ใส่คำอธิบาย"
-        android:layout_marginLeft="10dp"
-        android:background="@android:drawable/editbox_background_normal"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_above="@+id/relativeLayout" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoText"
+                android:hint="ใส่คำอธิบาย"
+                android:layout_below="@+id/chooseLocation"
+                android:background="@android:drawable/editbox_background_normal"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textSize="15dp"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="เลือกสถานที่"
+                android:gravity="center_vertical"
+                android:background="@android:drawable/editbox_background"
+                android:layout_below="@+id/tempImg"
+                android:id="@+id/chooseLocation"
+                android:textSize="15dp" />
+
         </RelativeLayout>
     </ScrollView>
+
 </RelativeLayout>

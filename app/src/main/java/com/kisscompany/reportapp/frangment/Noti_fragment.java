@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.fragmentPagerAdapter;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class Noti_fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Main_menu.title.setText("ประวัติการใช้งาน");
         notiView = inflater.inflate(R.layout.fragment_noti_fragment, container, false);
         viewPager = (ViewPager)notiView.findViewById(R.id.noti_pager);
         List<Fragment> listFragment = new ArrayList<Fragment>();

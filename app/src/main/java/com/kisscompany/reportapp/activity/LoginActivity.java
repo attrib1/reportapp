@@ -1,6 +1,7 @@
 package com.kisscompany.reportapp.activity;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -8,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -50,26 +52,31 @@ public class LoginActivity extends AppCompatActivity {
     public static String userName;
     public static String facebookName;
     public static HttpRequestFactory requestFactory;
-
+    LoginButton loginButton;
+    ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("cancel","cancel10");
         FacebookSdk.sdkInitialize(getApplicationContext());
+        progress = new ProgressDialog(this);
         AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
-                Bundle params = new Bundle();
-                params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
-                setFaceBookInfo(newAccessToken,params);
+                Log.d("same", "same");
+                    Bundle params = new Bundle();
+                    params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
+                    setFaceBookInfo(newAccessToken, params);
+
             }
         };
         setContentView(R.layout.activity_login);
         Log.d("cancel","cancel8");
         callbackManager = CallbackManager.Factory.create();
         Log.d("cancel","cancel7");
-        LoginButton loginButton = (LoginButton) findViewById(R.id.loginButton);
+        loginButton = (LoginButton) findViewById(R.id.loginButton);
+
         try {
             requestFactory = getCredential();
             Log.d("cancel","cancel");
@@ -82,10 +89,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d("cancel","cancel3");
+               // Login();
                 Bundle params = new Bundle();
                 params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
                 setFaceBookInfo(AccessToken.getCurrentAccessToken(),params);
-
 
             }
 
@@ -138,6 +145,7 @@ public class LoginActivity extends AppCompatActivity {
 
         HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
         Log.d("finishCredential","finsih");
+
         return requestFactory;
     }
     @SuppressLint("NewApi") public static File stream2file(InputStream in) throws IOException
@@ -147,27 +155,13 @@ public class LoginActivity extends AppCompatActivity {
         IOUtils.copy(in, out);
         return tempFile; }
     @Override
-    public void onPause(){
-       // LoginManager.getInstance().logOut();
-        super.onPause();
-    }
-    public boolean isLoggedIn() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null;
-    }
-    public boolean checkInternet()
-    {
-        InetAddress inet;
-        try {
-            inet = InetAddress.getByName("www.google.com");
-            return true;
-        } catch (UnknownHostException e) {
+    public void onResume(){
 
-            return false;
-        }
+        super.onResume();
     }
     public void setFaceBookInfo(AccessToken acces,Bundle params)
     {
+        loginButton.setVisibility(View.INVISIBLE);
         new GraphRequest(acces, "me", params, HttpMethod.GET,
                 new GraphRequest.Callback() {
                     @Override
@@ -191,13 +185,23 @@ public class LoginActivity extends AppCompatActivity {
                                     facebookName = data.getString("name");
                                     Log.d("username",facebookName);
                                 }
-                                Intent intent = new Intent(LoginActivity.this,Main_menu.class);
-                                startActivity(intent);
+                                progress.dismiss();
+                                finish();
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
                 }).executeAsync();
+    }
+    public void Login()
+    {
+        progress.setCancelable(false);
+        progress.setMessage("Logging in ...");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setProgress(0);
+        progress.setMax(100);
+        progress.show();
     }
 }

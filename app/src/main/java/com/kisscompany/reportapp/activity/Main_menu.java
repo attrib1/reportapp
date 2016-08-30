@@ -23,6 +23,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -70,6 +71,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         , GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     View v,v2,v3,v4,v5,v6;
+    public static TextView title;
     DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
     public static String locaText = null;
@@ -85,6 +87,9 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = new Intent(this,LoginActivity.class);
+        intent.putExtra("key","0");
+        startActivityForResult(intent,7);
         setContentView(R.layout.activity_main_menu);
         Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
         //setSupportActionBar(tool);
@@ -94,19 +99,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
 
         drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
         avatar = (ImageView)findViewById(R.id.avatar);
-        Thread t=  new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    setProfilePic();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t.start();
-        TextView name = (TextView)findViewById(R.id.userName);
-        name.setText(LoginActivity.facebookName);
+
         drawer.setClickable(true);
 
         drawerList = (ListView)findViewById(R.id.navList);
@@ -117,7 +110,10 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LoginManager.getInstance().logOut();
-                finish();
+                Intent intent = new Intent(Main_menu.this,LoginActivity.class);
+
+                startActivityForResult(intent,7);
+                drawer.closeDrawer(GravityCompat.START);
             }
         });
                 toggle = new ActionBarDrawerToggle(this, drawer, tool, R.string.drawer_open, R.string.drawer_close) {
@@ -132,6 +128,20 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                         invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
                     }
                 };
+        int re = getResources().getIdentifier("ic_action_name","drawable", getPackageName());
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setHomeAsUpIndicator(ResourcesCompat.getDrawable(getResources(),re,null));
+        title = (TextView)findViewById(R.id.main_toolbar_title);
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawer.isDrawerVisible(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    drawer.openDrawer(GravityCompat.START);
+                }
+            }
+        });
         drawer.addDrawerListener(toggle);
         tabHost = (FragmentTabHost)findViewById(R.id.tab);/////////////////create tab host
         tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
@@ -335,14 +345,28 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         super.onPostCreate(saveInstant);
         toggle.syncState();
     }
-   /* @Override
+    @Override
     protected void onActivityResult(int request_code,int result_code,Intent data)
     {
-        if(request_code == 1)
+
+        if(request_code == 7)
         {
-            gps = getLocationConnect();
+            Thread t=  new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        setProfilePic();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            t.start();
+            TextView name = (TextView)findViewById(R.id.userName);
+            name.setText(LoginActivity.facebookName);
         }
-    }*/
+        super.onActivityResult(request_code,result_code,data);
+    }
     public void setProfilePic() throws IOException {
         URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
         // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
@@ -359,5 +383,11 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             }
         });
 
+    }
+    @Override
+    public void onBackPressed()
+    {
+        moveTaskToBack(true);
+      //  super.onBackPressed();
     }
 }
