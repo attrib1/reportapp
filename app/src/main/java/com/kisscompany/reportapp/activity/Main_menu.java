@@ -1,10 +1,12 @@
 package com.kisscompany.reportapp.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,6 +47,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +55,13 @@ import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.IOUtils;
+import com.google.api.services.storage.StorageScopes;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.frangment.Main_men_fragment;
 import com.kisscompany.reportapp.frangment.Noti_fragment;
@@ -60,11 +70,19 @@ import com.kisscompany.reportapp.frangment.call_fragment;
 import com.kisscompany.reportapp.frangment.twitt_fragment;
 import com.kisscompany.reportapp.util.sendFeedInfo;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class Main_menu extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks
@@ -82,24 +100,37 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     public static String lat="",lng="";
     private boolean gps = true;
     ListView drawerList;
-    ImageView avatar;
+    public static boolean loginFlag = false;
+    final int RESULT_FALSE = 4;
+    static ImageView avatar;
+    static TextView profileName;
     private FragmentTabHost tabHost;
+    public static HttpRequestFactory requestFactory;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent(this,LoginActivity.class);
-        intent.putExtra("key","0");
-        startActivityForResult(intent,7);
+        //Fabric.with(this, new Crashlytics());
+        // TODO: Move this to where you establish a user session
+
+
         setContentView(R.layout.activity_main_menu);
         Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
         //setSupportActionBar(tool);
+        try {
+            requestFactory = getCredential();
+            Log.d("cancel","cancel");
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         buildGoogleApiClient();//connect GPS
         googleApiClient.connect();
 
         drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
         avatar = (ImageView)findViewById(R.id.avatar);
-
+        profileName = (TextView)findViewById(R.id.userName);
         drawer.setClickable(true);
 
         drawerList = (ListView)findViewById(R.id.navList);
@@ -111,7 +142,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LoginManager.getInstance().logOut();
                 Intent intent = new Intent(Main_menu.this,LoginActivity.class);
-
                 startActivityForResult(intent,7);
                 drawer.closeDrawer(GravityCompat.START);
             }
@@ -345,12 +375,13 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         super.onPostCreate(saveInstant);
         toggle.syncState();
     }
-    @Override
+   /* @Override
     protected void onActivityResult(int request_code,int result_code,Intent data)
     {
-
-        if(request_code == 7)
+        Log.d("chanzaa","chanzaa");
+        if(request_code == 7 && result_code == RESULT_OK)
         {
+
             Thread t=  new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -366,7 +397,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             name.setText(LoginActivity.facebookName);
         }
         super.onActivityResult(request_code,result_code,data);
-    }
+    }*/
     public void setProfilePic() throws IOException {
         URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
         // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
@@ -390,4 +421,30 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         moveTaskToBack(true);
       //  super.onBackPressed();
     }
+    public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
+        List<String> scopes = new ArrayList<String>();
+        scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
+        HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
+        AssetManager am = getAssets();
+        InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
+        File file =stream2file(inputStream);
+        JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+                .setJsonFactory(JSON_FACTORY)
+                .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
+                .setServiceAccountScopes(scopes)
+                .setServiceAccountPrivateKeyFromP12File(file)
+                .build();
+
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
+        Log.d("finishCredential","finsih");
+
+        return requestFactory;
+    }
+    @SuppressLint("NewApi") public static File stream2file(InputStream in) throws IOException
+    { final File tempFile = File.createTempFile("okkk", null);
+        tempFile.deleteOnExit();
+        FileOutputStream out = new FileOutputStream(tempFile);
+        IOUtils.copy(in, out);
+        return tempFile; }
 }

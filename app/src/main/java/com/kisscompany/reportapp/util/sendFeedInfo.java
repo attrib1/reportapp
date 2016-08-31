@@ -59,6 +59,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
     PostClass post;//content to post
     HttpURLConnection connection;
     Activity act;
+    String picName;
     public sendFeedInfo(PostClass p, Activity a)
     {
         post = p;
@@ -86,25 +87,23 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             output = new DataOutputStream(connection.getOutputStream());
             post.setOwner(LoginActivity.facebookName);
             post.setFacebookID(LoginActivity.userName);
+            UUID uniqueKey = UUID.randomUUID();
+            picName = uniqueKey.toString();
             output.writeBytes(getUrlParam());
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String picName = reader.readLine();
+            Log.d("return",reader.readLine());
             output.flush();
             output.close();
-          //  int res = connection.getResponseCode();
-            //Log.d("SendingCode",String.valueOf(res));
             connection.disconnect();
          //   reader.close();
             ///end of first phase
             ///begin second phase
-          /*  UUID uniqueKey = UUID.randomUUID();
-            String picName = uniqueKey.toString();*/
 
-           /* String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
-            createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");*/
+            String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
+            createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
 
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
+            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
+            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
             mListener.onRefreshFinished();
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -116,13 +115,13 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         return null;
     }
     public String getUrlParam() throws IOException {
-        String url =  "Name="+URLEncoder.encode(post.getOwner(),"UTF-8");
+        String url =  "name="+URLEncoder.encode(post.getOwner(),"UTF-8");
 
-        url = url+"&Date="+String.valueOf(post.getDate())
+        url = url+"&date="+String.valueOf(post.getDate())
                 +"&lat="+URLEncoder.encode(Main_menu.lat,"UTF-8")+"&lng="+URLEncoder.encode(Main_menu.lng,"UTF-8")+
-        "&Comment="+URLEncoder.encode(post.getContent(),"UTF-8")+"&Address="+URLEncoder.encode(post.getAdress(),"UTF-8")+
-                "&Status="+URLEncoder.encode(post.getType(),"UTF-8")+
-        "&IDFacebook="+URLEncoder.encode(post.getFacebookID(),"UTF-8");
+        "&comment="+URLEncoder.encode(post.getContent(),"UTF-8")+"&address="+URLEncoder.encode(post.getAdress(),"UTF-8")+
+                "&status="+URLEncoder.encode("report","UTF-8")+"&problemtype="+URLEncoder.encode(post.getType(),"UTF-8")+
+        "&facebookid="+URLEncoder.encode(post.getFacebookID(),"UTF-8")+"&imageid="+URLEncoder.encode(picName,"UTF-8")+"&apptype=reportapp";
         Log.d("sendingParam",url);
         return url;
     }
@@ -142,7 +141,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         byte[] bitMapData = stream.toByteArray();
         HttpContent contentsend = new ByteArrayContent("image/jpeg", bitMapData );
         HttpRequest putRequest;
-        putRequest = LoginActivity.requestFactory.buildPutRequest(url2, contentsend);
+        putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
         HttpResponse response = putRequest.execute();
       //  String content = response.parseAsString();
      //   Log.d("debug", "response is:"+response.getStatusCode());
@@ -168,7 +167,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         byte[] b = new byte[0];
         HttpContent contentsend = new ByteArrayContent("image/jpeg", b);
         HttpRequest putRequest;
-        putRequest = LoginActivity.requestFactory.buildPutRequest(url2, contentsend);
+        putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
         HttpResponse response = putRequest.execute();
         //  String content = response.parseAsString();
         //   Log.d("debug", "response is:"+response.getStatusCode());

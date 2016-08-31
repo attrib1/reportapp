@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -46,12 +47,13 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
+
 public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
     public static String profilePicUrl;
     public static String userName;
     public static String facebookName;
-    public static HttpRequestFactory requestFactory;
     LoginButton loginButton;
     ProgressDialog progress;
 
@@ -77,14 +79,6 @@ public class LoginActivity extends AppCompatActivity {
         Log.d("cancel","cancel7");
         loginButton = (LoginButton) findViewById(R.id.loginButton);
 
-        try {
-            requestFactory = getCredential();
-            Log.d("cancel","cancel");
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -128,32 +122,8 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         Log.d("cancel","cancel2");
     }
-    public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
-        List<String> scopes = new ArrayList<String>();
-        scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
-        HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
-        AssetManager am = getAssets();
-        InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
-        File file =stream2file(inputStream);
-        JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
-                .setJsonFactory(JSON_FACTORY)
-                .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
-                .setServiceAccountScopes(scopes)
-                .setServiceAccountPrivateKeyFromP12File(file)
-                .build();
 
-        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-        Log.d("finishCredential","finsih");
 
-        return requestFactory;
-    }
-    @SuppressLint("NewApi") public static File stream2file(InputStream in) throws IOException
-    { final File tempFile = File.createTempFile("okkk", null);
-        tempFile.deleteOnExit();
-        FileOutputStream out = new FileOutputStream(tempFile);
-        IOUtils.copy(in, out);
-        return tempFile; }
     @Override
     public void onResume(){
 
@@ -186,6 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                                     Log.d("username",facebookName);
                                 }
                                 progress.dismiss();
+                                setResult(RESULT_OK);
                                 finish();
 
                             } catch (Exception e) {
@@ -203,5 +174,10 @@ public class LoginActivity extends AppCompatActivity {
         progress.setProgress(0);
         progress.setMax(100);
         progress.show();
+    }
+    @Override
+    public void onBackPressed()
+    {
+        finish();
     }
 }

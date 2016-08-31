@@ -35,6 +35,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
@@ -47,10 +48,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class Camera extends AppCompatActivity {
@@ -118,35 +122,42 @@ public class Camera extends AppCompatActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*setResult(RESULT_CANCELED);
-                finish();*/
-                Intent intent = new Intent(Camera.this,chooseLocation.class);
-                startActivity(intent);
+                Log.d("camCancel","cancel");
+                setResult(RESULT_CANCELED);
+                finish();
+
             }
         });
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pic != null) {
-                    progress = new ProgressDialog(Camera.this);
-                    Upload();
-                    PostClass sendPost = createPost();
-                    sendFeedInfo send = new sendFeedInfo(sendPost, Camera.this);
-                    send.setCustomEventListener(new sendFeedInfo.OnRefreshFinishListener() {
-                        @Override
-                        public void onRefreshFinished() {
-                            progress.dismiss();
-                            setResult(RESULT_OK);
-                            finish();
+                if (Main_menu.loginFlag) {
+                    if (pic != null) {
+                        progress = new ProgressDialog(Camera.this);
+                        Upload();
+                        PostClass sendPost = createPost();
+                        sendFeedInfo send = new sendFeedInfo(sendPost, Camera.this);
+                        send.setCustomEventListener(new sendFeedInfo.OnRefreshFinishListener() {
+                            @Override
+                            public void onRefreshFinished() {
+                                progress.dismiss();
+                                setResult(RESULT_OK);
+                                finish();
 
-                        }
-                    });
-                    send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
-                    Toast.makeText(Camera.this, "Done posting", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
+                        Toast.makeText(Camera.this, "Done posting", Toast.LENGTH_SHORT).show();
+                    } else
+                        Toast.makeText(Camera.this, "เลือกประเภทปัญหา", Toast.LENGTH_SHORT).show();
                 }
                 else
-                    Toast.makeText(Camera.this,"เลือกประเภทปัญหา",Toast.LENGTH_SHORT).show();
+                {
+                    Intent intent = new Intent(Camera.this,LoginActivity.class);
+                    intent.putExtra("key","0");
+                    startActivityForResult(intent,7);
+                }
             }
 
         });
@@ -157,23 +168,24 @@ public class Camera extends AppCompatActivity {
     public void onActivityResult(int request_code,int result_code,Intent data)
     {
 
-        if (request_code == Crop.REQUEST_CROP&& result_code == CropImageActivity.RESULT_OK) {
+        if (request_code == Crop.REQUEST_CROP&& result_code == CropImageActivity.RESULT_OK) {///result from crop
 
             WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             DisplayMetrics dm = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(dm);
             widthInDP = Math.round(dm.widthPixels);
             inIm.getLayoutParams().height = widthInDP;
-            final BitmapFactory.Options options = new BitmapFactory.Options();
+           /* final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(output.getAbsolutePath(),options);
-            options.inSampleSize = calculateInSampleSize(options, 400,400);
-            options.inJustDecodeBounds = false;
-            resultImage = BitmapFactory.decodeFile(output.getAbsolutePath(),options);
+            options.inSampleSize = calculateInSampleSize(options, 640,640);
+            options.inJustDecodeBounds = false;*/
+             resultImage = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(output.getAbsolutePath()), 640, 640, true);
+          //  resultImage = BitmapFactory.decodeFile(output.getAbsolutePath());
             inIm.setImageBitmap(resultImage);
 
         }
-        else if(request_code == Cam_request && result_code != RESULT_CANCELED){
+        else if(request_code == Cam_request && result_code != RESULT_CANCELED){ ///result from camera
 
             ExifInterface ei = null;
             try {
@@ -207,7 +219,7 @@ public class Camera extends AppCompatActivity {
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
            // Log.d("ImageSize",String.valueOf(output.length()));
         }
-        else if(request_code == LOCATION_REQUEST && result_code ==RESULT_OK)
+        else if(request_code == LOCATION_REQUEST && result_code ==RESULT_OK)//result from choose location OK
         {
             Bundle bundle = data.getBundleExtra("location");
             String location = bundle.getString("name")+"\n";
@@ -221,6 +233,22 @@ public class Camera extends AppCompatActivity {
                 location = location + bundle.getString("country")+" ";
             chooseLocation.setText(location);
 
+        }
+        else if(request_code == 7&& result_code == RESULT_OK)/// result from facebook login
+        {
+            Main_menu.loginFlag = true;
+            Thread t=  new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        setProfilePic();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            t.start();
+            Main_menu.profileName.setText(LoginActivity.facebookName);
         }
         else
         {
@@ -252,26 +280,6 @@ public class Camera extends AppCompatActivity {
        // typeText.setText(v.getTag().toString());
 
 
-    }
-    public Bitmap scaleDown(Bitmap original)
-    {
-        int width  = original.getWidth();
-        int height = original.getHeight();
-        int newWidth = 200;
-        int newHeight = 200;
-
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth,scaleHeight);
-
-        original = Bitmap.createBitmap(original,0,0,newWidth,newHeight,null,false);
-        inIm.setImageBitmap(original);
-        //Toast.makeText(getBaseContext(),NewImg.getWidth()+" "+NewImg.getHeight(),Toast.LENGTH_SHORT).show();
-        //BitmapDrawable bmd = new BitmapDrawable(NewImg);
-        //inIm.setImageDrawable(bmd);
-        return original;
     }
     private static final int REQUEST_EXTERNAL_STORAGE = 1;////verify permission
     private static String[] PERMISSIONS_STORAGE = {
@@ -341,6 +349,35 @@ public class Camera extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(currentDateTime);
     }
+    public void setProfilePic() throws IOException {
 
+        URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
+        // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
+        options.inSampleSize = Camera.calculateInSampleSize(options, 100,100);
+        options.inJustDecodeBounds = false;
+        final Bitmap temp = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Main_menu.avatar.setImageBitmap(temp);
+            }
+        });
+
+    }
+    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
+                                   boolean filter) {
+        float ratio = Math.min(
+                (float) maxImageSize / realImage.getWidth(),
+                (float) maxImageSize / realImage.getHeight());
+        int width = Math.round((float) ratio * realImage.getWidth());
+        int height = Math.round((float) ratio * realImage.getHeight());
+
+        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
+                height, filter);
+        return newBitmap;
+    }
 
 }

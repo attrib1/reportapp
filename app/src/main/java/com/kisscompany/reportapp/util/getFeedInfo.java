@@ -7,6 +7,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Handler;
+
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
@@ -146,13 +148,18 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     }
 
 
-    public Bitmap getPicture(String picName,String fbName) throws GeneralSecurityException, IOException {
+    public Bitmap getPicture(String picName,String fbName,int type) throws GeneralSecurityException, IOException {
         //String URI = "https://storage.googleapis.com/" + "traffy_image/"+picName;
         first = System.currentTimeMillis();
       //  Log.d("picNmae",picName);
-        String URI =  "https://storage.googleapis.com/" + "traffy_image/"+picName;
+        String URI = "" ;
+        if(type == 0)
+            URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName+"640x640.jpg";
+        else
+            URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
+        Log.d("URI",URI);
         GenericUrl url2 = new GenericUrl(URI);
-        HttpRequest get = LoginActivity.requestFactory.buildGetRequest(url2);
+        HttpRequest get = Main_menu.requestFactory.buildGetRequest(url2);
         HttpResponse response2 = get.execute();
         final Bitmap bm = BitmapFactory.decodeStream(new BufferedInputStream((response2.getContent())));
         response2.disconnect();
@@ -171,19 +178,20 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         for(int i = index ; i < index+5 && i<JArray.length();i++) {
             Log.d("index",String.valueOf(i));
             JSONObject JObject = JArray.getJSONObject(i);
-            String picture = JObject.getString("id");
-            String name = JObject.getString("name");
+            String picture = URLEncoder.encode(JObject.getString("image_id"),"UTF8");
+            String name = URLEncoder.encode(JObject.getString("name"),"UTF-8");
             //int like = JObject.getInt("like");
             String content = JObject.getString("comment");
             String stat = JObject.getString("status");
             Log.d("stat",stat);
+            String problem = JObject.getString("problem_type");
             String time = JObject.getString("time_stamp");
-            String faceBook = JObject.getString("facebook_id");
+             String faceBook = JObject.getString("facebook");
             String address = JObject.getString("address");
-            Bitmap BitmapPic = getPicture(picture,name);
-            PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,stat);
+            Bitmap BitmapPic = getPicture(picture,name,0);
+            PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,problem);
             currentPost.setOwner(name);
-            currentPost.setProfilePic(getPicture(faceBook,name));
+            currentPost.setProfilePic(getPicture(faceBook,name,1));
             posts.add(currentPost);
             // re establish image url
         }
@@ -205,7 +213,9 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             }
         });
 
+
     }
+
 
 
 }
