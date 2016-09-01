@@ -2,6 +2,8 @@ package com.kisscompany.reportapp.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +25,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
@@ -48,7 +51,9 @@ import android.widget.Toast;
 
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
+import com.facebook.login.widget.ProfilePictureView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -100,12 +105,16 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     public static String lat="",lng="";
     private boolean gps = true;
     ListView drawerList;
-    public static boolean loginFlag = false;
+    public static int loginFlag = 0;
     final int RESULT_FALSE = 4;
     static ImageView avatar;
     static TextView profileName;
     private FragmentTabHost tabHost;
+    static ProfilePictureView profilePictureView;
     public static HttpRequestFactory requestFactory;
+    public static String id;
+    public static String profileUrl;
+    public static String profileString = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +124,16 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
 
         setContentView(R.layout.activity_main_menu);
         Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+      //  initSharePref();
+      /* SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit().clear();
+        editor.commit();*/
+
+        verifyStoragePermissions(this);
+        profilePictureView = (ProfilePictureView) findViewById(R.id.avatar);
+        profileName = (TextView)findViewById(R.id.userName);
+        getSharePref();
         //setSupportActionBar(tool);
         try {
             requestFactory = getCredential();
@@ -129,20 +148,30 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         googleApiClient.connect();
 
         drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
-        avatar = (ImageView)findViewById(R.id.avatar);
-        profileName = (TextView)findViewById(R.id.userName);
+
         drawer.setClickable(true);
 
         drawerList = (ListView)findViewById(R.id.navList);
-        String[] list = {"Logout"};
-        ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
+        final ArrayList<String> list = new ArrayList<String>();
+        if(loginFlag == 1)
+            list.add("Logout");
+        final ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
         drawerList.setAdapter(adapter);
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LoginManager.getInstance().logOut();
-                Intent intent = new Intent(Main_menu.this,LoginActivity.class);
-                startActivityForResult(intent,7);
+                if(loginFlag == 1) {/// logout clear Preference iamge and text
+                    LoginManager.getInstance().logOut();
+                    profilePictureView.setProfileId(null);
+                    profileName.setText("Anonymous");
+                    SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit().clear();
+                    editor.commit();
+                    loginFlag = 0;
+                    list.remove(position);
+                    ((ArrayAdapter)adapter).notifyDataSetChanged();
+                    Toast.makeText(Main_menu.this, "Logout Complete", Toast.LENGTH_SHORT).show();
+                }
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
@@ -168,6 +197,11 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                 if (drawer.isDrawerVisible(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
                 } else {
+                    if(loginFlag == 1) {
+                        list.clear();
+                        list.add("Logout");
+                    }
+                    ((ArrayAdapter)adapter).notifyDataSetChanged();
                     drawer.openDrawer(GravityCompat.START);
                 }
             }
@@ -179,8 +213,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         final TabHost.TabSpec tab1 = tabHost.newTabSpec("tab1");
         TabHost.TabSpec tab2 = tabHost.newTabSpec("tab2");
         TabHost.TabSpec tab3 = tabHost.newTabSpec("tab3");
-        TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
-        TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
+       // TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
+     //   TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
         TabHost.TabSpec tab6 = tabHost.newTabSpec("tab6");
 
         v = LayoutInflater.from(this).inflate(R.layout.tab_layout,null);
@@ -193,19 +227,19 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         tab2.setIndicator(v2);
         tab3.setIndicator(v3);
 
-        v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
-        tab4.setIndicator(v4);
+    /*    v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
+        tab4.setIndicator(v4);*/
 
-        v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
+    /*    v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
         tab5.setIndicator(v5);
-
+*/
 
 
         tabHost.addTab(tab1,Main_men_fragment.class,null);
         tabHost.addTab(tab2,Report_fragment.class,null);
         tabHost.addTab(tab3,Noti_fragment.class,null);
-        tabHost.addTab(tab4,call_fragment.class,null);
-        tabHost.addTab(tab5,twitt_fragment.class,null);
+      //  tabHost.addTab(tab4,call_fragment.class,null);
+     //   tabHost.addTab(tab5,twitt_fragment.class,null);
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
 
             @Override
@@ -216,9 +250,11 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivity(camera);
                 }*/
-                tabHost.destroyDrawingCache();
+              //  tabHost.destroyDrawingCache();
                 setTabColor(tabHost);
-
+                Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
+                fg.refresher();//cancel loading api thread
+                fg.destroyCache();//destroy drawing cache
             }
 
         });
@@ -447,4 +483,58 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         FileOutputStream out = new FileOutputStream(tempFile);
         IOUtils.copy(in, out);
         return tempFile; }
+    public void initSharePref()
+    {
+        SharedPreferences sharedPref = getSharedPreferences(
+                getString(R.string.login_status), Context.MODE_PRIVATE);
+    }
+    public void getSharePref()
+    {
+        SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
+        String flag = sharedPref.getString(getString(R.string.login_status),null);
+
+        if(flag !=null) {
+            Log.d("loginWoi",flag);
+            loginFlag = Integer.parseInt(flag);
+            if(loginFlag==1)
+            {
+                id = sharedPref.getString("id",null);
+
+
+                profilePictureView.setProfileId(id);
+                profileString = sharedPref.getString("Name",null);
+                profileUrl = sharedPref.getString("profileUrl",null);
+                Log.d("profileUrl",profileUrl);
+                profileName.setText(profileString);
+
+            }
+
+        }
+        else{
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.login_status), "0");
+            editor.commit();
+            loginFlag = 0;
+        }
+    }
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;////verify permission
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have read or write permission
+        int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (writePermission != PackageManager.PERMISSION_GRANTED || readPermission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
 }

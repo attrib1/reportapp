@@ -8,7 +8,6 @@ import java.util.Date;
  * Created by chanpc on 8/9/2016.
  */
 public class PostClass {
-
     String Owner="Chan",Content,status;
     Bitmap mainPic,profile;
     String adress;

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -36,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.login.widget.ProfilePictureView;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
@@ -60,12 +62,14 @@ import io.fabric.sdk.android.Fabric;
 public class Camera extends AppCompatActivity {
 
     String imageLocation;
+    String location = null;
     int widthInDP;
     TextView send,typeText,cancel;
     File output;
     ImageView colorTab;
     HorizontalScrollView scroll;
     static final int Cam_request = 1;
+
     String color = null;
     String pic = null;
     ImageView inIm;
@@ -76,6 +80,7 @@ public class Camera extends AppCompatActivity {
     final int LOCATION_REQUEST = 3;
     final String CLIENT_ID = "CWIB5QARTPRLLQIVCYKM5MVXYSQCRGYM1VZ31AJ4DCIMKEJ";
     final String CLIENT_SECRET = "4SDDGS3PYQ5JQOX4WU0XJTXAKH1HSHEFQ1I21V4KHDR15PG";
+    String exifOrientation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +95,6 @@ public class Camera extends AppCompatActivity {
 
         if(savedInstanceState == null) {
             // everything else that doesn't update UI
-            verifyStoragePermissions(this);
             Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             File dir=
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -132,8 +136,12 @@ public class Camera extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Main_menu.loginFlag) {
-                    if (pic != null) {
+                if (Main_menu.loginFlag == 1) {//if already login
+                    if(currentType ==null)
+                        Toast.makeText(Camera.this, "เลือกประเภทปัญหา", Toast.LENGTH_SHORT).show();
+                    else if(location ==null)
+                        Toast.makeText(Camera.this, "เลือกสถานที่", Toast.LENGTH_SHORT).show();
+                    else {
                         progress = new ProgressDialog(Camera.this);
                         Upload();
                         PostClass sendPost = createPost();
@@ -149,13 +157,14 @@ public class Camera extends AppCompatActivity {
                         });
                         send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
                         Toast.makeText(Camera.this, "Done posting", Toast.LENGTH_SHORT).show();
-                    } else
-                        Toast.makeText(Camera.this, "เลือกประเภทปัญหา", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
-                else
+                else// if not login yet
                 {
                     Intent intent = new Intent(Camera.this,LoginActivity.class);
                     intent.putExtra("key","0");
+                    Toast.makeText(getBaseContext(),"Please login to facebook",Toast.LENGTH_SHORT).show();
                     startActivityForResult(intent,7);
                 }
             }
@@ -181,12 +190,37 @@ public class Camera extends AppCompatActivity {
             options.inSampleSize = calculateInSampleSize(options, 640,640);
             options.inJustDecodeBounds = false;*/
              resultImage = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(output.getAbsolutePath()), 640, 640, true);
-          //  resultImage = BitmapFactory.decodeFile(output.getAbsolutePath());
+            switch(exifOrientation) {
+                case "6":
+                    resultImage = rotateImage(resultImage, 90);
+                    break;
+                case "3":
+                    resultImage =rotateImage(resultImage, 180);
+                    break;
+                case "8":
+                    resultImage = rotateImage(resultImage, 270);
+                    break;
+                default:
+                    break;
+            }
             inIm.setImageBitmap(resultImage);
 
         }
         else if(request_code == Cam_request && result_code != RESULT_CANCELED){ ///result from camera
 
+          /*   final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(output.getAbsolutePath(),options);
+            options.inSampleSize = 5;
+            options.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory.decodeFile(output.getAbsolutePath(),options);
+            try {
+                FileOutputStream fileout = new FileOutputStream(output);
+                bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileout);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }*/
+            Log.d("result_code","result = "+result_code);
             ExifInterface ei = null;
             try {
 
@@ -194,9 +228,10 @@ public class Camera extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String exifOrientation = ei
+            exifOrientation = ei
                     .getAttribute(ExifInterface.TAG_ORIENTATION);
-            Bitmap bitmap = BitmapFactory.decodeFile(output.getAbsolutePath());
+            //Bitmap bitmap = BitmapFactory.decodeFile(output.getAbsolutePath());
+       /*     Log.d("Orient",exifOrientation);
             switch(exifOrientation) {
                 case "6":
                     bitmap = rotateImage(bitmap, 90);
@@ -215,14 +250,15 @@ public class Camera extends AppCompatActivity {
                 bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileout);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            }
+            }*/
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
+
            // Log.d("ImageSize",String.valueOf(output.length()));
         }
         else if(request_code == LOCATION_REQUEST && result_code ==RESULT_OK)//result from choose location OK
         {
             Bundle bundle = data.getBundleExtra("location");
-            String location = bundle.getString("name")+"\n";
+            location = bundle.getString("name")+"\n";
             if(bundle.getString("state").length() > 0)
                 location = location + bundle.getString("state")+" ";
             if(bundle.getString("city").length() > 0)
@@ -236,19 +272,13 @@ public class Camera extends AppCompatActivity {
         }
         else if(request_code == 7&& result_code == RESULT_OK)/// result from facebook login
         {
-            Main_menu.loginFlag = true;
-            Thread t=  new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        setProfilePic();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            t.start();
+            Main_menu.loginFlag = 1;
+            setLoginFlag();
+            Main_menu.profilePictureView.setProfileId(LoginActivity.userName);
             Main_menu.profileName.setText(LoginActivity.facebookName);
+            Main_menu.profileString = LoginActivity.facebookName;
+            Main_menu.id = LoginActivity.userName;
+            Main_menu.profileUrl = LoginActivity.profilePicUrl;
         }
         else
         {
@@ -269,37 +299,15 @@ public class Camera extends AppCompatActivity {
 
 
 
-    public void Click(View v)
+    public void Click(View v)//when blick at type picture
     {
         if(currentType!=null)
             currentType.setBackgroundColor(0x00000000);
         currentType = v;
         v.setBackgroundColor(Color.parseColor("#4Da8a8a8"));
         pic = v.getTag().toString();
-
-       // typeText.setText(v.getTag().toString());
-
-
     }
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;////verify permission
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have read or write permission
-        int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if (writePermission != PackageManager.PERMISSION_GRANTED || readPermission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-        }
-    }
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
@@ -349,7 +357,7 @@ public class Camera extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(currentDateTime);
     }
-    public void setProfilePic() throws IOException {
+  /*  public void setProfilePic() throws IOException {
 
         URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
         // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
@@ -366,7 +374,7 @@ public class Camera extends AppCompatActivity {
             }
         });
 
-    }
+    }*/
     public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
                                    boolean filter) {
         float ratio = Math.min(
@@ -378,6 +386,17 @@ public class Camera extends AppCompatActivity {
         Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
                 height, filter);
         return newBitmap;
+    }
+    public void setLoginFlag()
+    {
+        SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.login_status), String.valueOf(Main_menu.loginFlag));
+        editor.putString("id",LoginActivity.userName);
+        editor.putString("Name",LoginActivity.facebookName);
+        editor.putString("profileUrl",LoginActivity.profilePicUrl);
+        Log.d("FBNAME",LoginActivity.facebookName);
+        editor.commit();
     }
 
 }

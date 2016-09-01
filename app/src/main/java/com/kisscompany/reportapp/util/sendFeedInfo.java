@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -60,6 +61,8 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
     HttpURLConnection connection;
     Activity act;
     String picName;
+    String fbName;
+    boolean ok;
     public sendFeedInfo(PostClass p, Activity a)
     {
         post = p;
@@ -85,26 +88,26 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             connection.connect();
 
             output = new DataOutputStream(connection.getOutputStream());
-            post.setOwner(LoginActivity.facebookName);
-            post.setFacebookID(LoginActivity.userName);
+            post.setOwner(Main_menu.profileString);
+            post.setFacebookID(Main_menu.id);
             UUID uniqueKey = UUID.randomUUID();
             picName = uniqueKey.toString();
-            output.writeBytes(getUrlParam());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            Log.d("return",reader.readLine());
-            output.flush();
-            output.close();
-            connection.disconnect();
-         //   reader.close();
-            ///end of first phase
-            ///begin second phase
+            fbName = URLEncoder.encode(Main_menu.profileString,"UTF-8");
+            //output.writeBytes(getUrlParam());
 
-            String fbName = URLEncoder.encode(LoginActivity.facebookName,"UTF-8");
             createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
+            ok = savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
+            if(ok)
+                ok = savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+ URLEncoder.encode(Main_menu.id,"UTF-8"),getProfilePic());
+            if(ok) {
+                output.writeBytes(getUrlParam());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                output.flush();
+                output.close();
+            }
 
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
-            savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+ URLEncoder.encode(LoginActivity.userName,"UTF-8"),getProfilePic());
-            mListener.onRefreshFinished();
+            connection.disconnect();
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -112,9 +115,11 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        mListener.onRefreshFinished();
         return null;
     }
     public String getUrlParam() throws IOException {
+        Log.d("debuggg",post.getFacebookID());
         String url =  "name="+URLEncoder.encode(post.getOwner(),"UTF-8");
 
         url = url+"&date="+String.valueOf(post.getDate())
@@ -131,7 +136,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         FileOutputStream out = new FileOutputStream(tempFile);
         IOUtils.copy(in, out);
         return tempFile; }
-    public void savePicture(String url,Bitmap bm) throws IOException {
+    public boolean savePicture(String url,Bitmap bm) {
         Log.d("sendURL",url);
         GenericUrl url2 = new GenericUrl(url);
         //byte array holds the data, in this case the image i want to upload in bytes.
@@ -141,16 +146,30 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         byte[] bitMapData = stream.toByteArray();
         HttpContent contentsend = new ByteArrayContent("image/jpeg", bitMapData );
         HttpRequest putRequest;
-        putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
-        HttpResponse response = putRequest.execute();
-      //  String content = response.parseAsString();
+
+        HttpResponse response = null;
+        final long time = System.currentTimeMillis();
+            while(System.currentTimeMillis()-time < 10000) {
+                try {
+                    Thread.sleep(100);
+                    putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
+                    response = putRequest.execute();
+                    response.disconnect();
+                    return true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        //  String content = response.parseAsString();
      //   Log.d("debug", "response is:"+response.getStatusCode());
      //   Log.d("debug", "response content is:"+content);
-        response.disconnect();
-
+        return false;
     }
     public static Bitmap getProfilePic() throws IOException {
-        URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
+        URL facebookProfileURL= new URL(Main_menu.profileUrl);
        // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -173,5 +192,20 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         //   Log.d("debug", "response is:"+response.getStatusCode());
         //   Log.d("debug", "response content is:"+content);
         response.disconnect();
+    }
+    public void checkResize() throws IOException {
+
+        String    URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName+"640x640.jpg";
+        GenericUrl url2 = new GenericUrl(URI);
+        HttpRequest get = Main_menu.requestFactory.buildGetRequest(url2);
+        HttpResponse response2 = get.execute();
+    }
+    @Override
+    public void onPostExecute(String result)
+    {
+       if(ok==false)
+           Toast.makeText(act.getBaseContext(),"Upload fail, please try again",Toast.LENGTH_SHORT).show();
+        else
+           Toast.makeText(act.getBaseContext(),"Upload Complete",Toast.LENGTH_SHORT).show();
     }
 }

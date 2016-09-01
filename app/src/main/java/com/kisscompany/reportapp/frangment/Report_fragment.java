@@ -86,9 +86,9 @@ public class Report_fragment extends Fragment {
             Intent camera = new Intent(getContext(), Camera.class);
             startActivityForResult(camera, REQUEST);
         }
-        cameraView = inflater.inflate(R.layout.fragment_report_fragment, container, false);
+        cameraView = inflater.inflate(R.layout.loading_layout, container, false);
 
-        date = (TextView)cameraView.findViewById(R.id.dateText);
+     /*   date = (TextView)cameraView.findViewById(R.id.dateText);
         incident = (ImageView)cameraView.findViewById(R.id.incidentPic);
         color = (ImageView)cameraView.findViewById(R.id.color);
         typeImage = (ImageView)cameraView.findViewById(R.id.typeImage);
@@ -130,7 +130,7 @@ public class Report_fragment extends Fragment {
         DisplayMetrics dm = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dm);
         int widthInDP = Math.round(dm.widthPixels);
-        incident.getLayoutParams().height = widthInDP;
+        incident.getLayoutParams().height = widthInDP;*/
 
         return cameraView;
     }
@@ -156,7 +156,7 @@ public class Report_fragment extends Fragment {
 
 
     }
-    @Override
+  /*  @Override
     public void onPause() {
         info.setText(" ");
         super.onPause();
@@ -165,9 +165,8 @@ public class Report_fragment extends Fragment {
     @Override
     public void onResume()
     {
-        date.requestFocus();
         super.onResume();
-    }
+    }*/
     public void getDate()
     {
         Date currentDateTime = new Date(); //get date and time2

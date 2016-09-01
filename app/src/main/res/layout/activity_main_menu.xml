@@ -104,12 +104,12 @@
             android:background="@color/material_blue_grey_800"
             android:padding="8dp" >
 
-            <ImageView
+            <com.facebook.login.widget.ProfilePictureView
                 android:id="@+id/avatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/ic_camera_gray"
-                android:layout_marginTop="15dp" />
+                android:layout_marginTop="15dp"
+                />
 
             <LinearLayout
                 android:layout_width="wrap_content"

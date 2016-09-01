@@ -62,8 +62,9 @@ public class Main_men_fragment extends Fragment {
                              Bundle savedInstanceState) {
         Main_menu.title.setText("New Feeds");
         // Inflate the layout for this fragment
+        Log.d("create","Create");
         View customView = inflater.inflate(R.layout.fragment_main_men_fragment,container,false);
-
+        setRetainInstance(true);
         refresh = (SwipeRefreshLayout)customView.findViewById(R.id.main_swipe);////refresh bar
         //refresh.setRefreshing(false);
         feed_list = (ListView)customView.findViewById(R.id.newFeedList);
@@ -81,20 +82,18 @@ public class Main_men_fragment extends Fragment {
                                 @Override
                                 public void run() {
                                     refresh.setRefreshing(false);
+                                    refresh.setEnabled(true);
                                 }
                             });
                         }
                     }
                 });
-                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=100");
+                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=100&app_type=reportapp");
                 refresh.setEnabled(false);
             }
         };
         refresh.setOnRefreshListener(refreshListener);
-        list = new ArrayList<PostClass>();
-        Queue<Integer> v = new LinkedList<Integer>();
-        ListAdapter adapter = new NewFeed_Adapter(getActivity(),list,v);
-        feed_list.setAdapter(adapter);
+
         feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -143,39 +142,73 @@ public class Main_men_fragment extends Fragment {
             }
         });
 
-      /*  refresh.post(new Runnable() {
-            @Override public void run() {
-                refresh.setRefreshing(true);
-                refreshListener.onRefresh();
-            }
-        });*/
-        feed_list.setSmoothScrollbarEnabled(true);
-
-        return customView;
-    }
-    @Override
-    public void onPause(){
-        Log.d("destroy","destroy");
-        refresh.setRefreshing(false);
-        if (refresh!=null) {
-            refresh.setRefreshing(false);
-            refresh.destroyDrawingCache();
-            refresh.clearAnimation();
-        }
-
-        super.onPause();
-    }
-    @Override
-    public void onResume(){
         refresh.post(new Runnable() {
             @Override public void run() {
                 refresh.setRefreshing(true);
                 refreshListener.onRefresh();
             }
         });
+        feed_list.setSmoothScrollbarEnabled(true);
+
+        return customView;
+    }
+    @Override
+    public void onPause(){
+       // refresh.setRefreshing(false);
+       /* if (refresh!=null) {
+           refresh.setRefreshing(false);
+            refresh.destroyDrawingCache();
+            refresh.clearAnimation();
+        }*/
+        super.onPause();
+    }
+    @Override
+    public void onResume(){
+
+
         super.onResume();
     }
+    @Override
+    public void onDestroy()
+    {
+        Log.d("destroy","destroy");
+        super.onDestroy();
+    }
+   /* @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        if(refresh.isRefreshing() ==true)
+            outState.putString("refresh","true");
+        else
+            outState.putString("refresh","false");
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+       if (savedInstanceState != null) {
+
+            if(savedInstanceState.getString("refresh").equals("true"))
+            {
+                refresh.setRefreshing(true);
+            }
+        }
+    }
+*/
+    public void refresher()
+    {
+        feedInfo.cancel(true);
+    }
+    public void setrefresh()
+    {
+        refresh.setRefreshing(true);
+    }
+    public void destroyCache()
+    {
+        refresh.setRefreshing(false);
+        refresh.destroyDrawingCache();
+        refresh.clearAnimation();
+    }
 
 }

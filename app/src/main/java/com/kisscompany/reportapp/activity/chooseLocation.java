@@ -13,6 +13,7 @@ import com.kisscompany.reportapp.util.getFourSquare;
 
 public class chooseLocation extends ListActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

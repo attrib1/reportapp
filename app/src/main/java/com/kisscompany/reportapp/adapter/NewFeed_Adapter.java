@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.util.PostClass;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Queue;
 
@@ -54,21 +56,13 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
         }
         else{
             customView = inflater.inflate(R.layout.newfeed_layout, parent, false);
-            typeText = (TextView)customView.findViewById(R.id.typeText);///impliment click to hide text
-            typeText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    visibleQueue.add(position);
-                }
-            });
-            setType(getItem(position).getType());
             profile = (ImageView)customView.findViewById(R.id.profile);
             profile.setImageBitmap(getItem(position).getProfilePic());
             incident = (ImageView)customView.findViewById(R.id.incident);
             incident.getLayoutParams().height = widthInDP;
             typeImg = (ImageView)customView.findViewById(R.id.typeImage);///impliment click to hide image
-            Log.d("debug",getItem(position).getType());
             int res = con.getResources().getIdentifier(getItem(position).getType(),"drawable", getContext().getPackageName());
+            Log.d("id",getItem(position).getType());
             typeImg.setImageDrawable(ResourcesCompat.getDrawable(con.getResources(),res,null));
             incident.setImageBitmap(getItem(position).getPic());
             text = (TextView) customView.findViewById(R.id.date);
@@ -78,7 +72,11 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             descript = (TextView)customView.findViewById(R.id.comment);
             descript.setText(getItem(position).getContent());
             name = (TextView)customView.findViewById(R.id.nameText);
-            name.setText(getItem(position).getOwner());
+            try {
+                name.setText(URLDecoder.decode(getItem(position).getOwner(),"UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
 
         customView.setEnabled(false);
@@ -99,7 +97,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             notifyDataSetChanged();
         };
     }
-    public void setType(String choose)
+  /*  public void setType(String choose)
     {
 
         switch(choose){
@@ -109,7 +107,7 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             case "ic_money":typeText.setText("problem 4");break;
             case "ic_helicopter":typeText.setText("problem 5");break;
         }
-    }
+    }*/
 
 }
 

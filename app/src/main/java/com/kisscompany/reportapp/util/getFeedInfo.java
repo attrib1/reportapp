@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.GenericUrl;
@@ -62,6 +63,7 @@ import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import io.fabric.sdk.android.services.common.SystemCurrentTimeProvider;
 import retrofit2.http.Url;
 
 /**
@@ -74,6 +76,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     ListView listV;
     OnRefreshFinishListener mListener = null;
     List<PostClass> posts;
+    ArrayList<PostClass> dumper;
     Class c;
     int index = 0;
     JSONArray JArray;
@@ -84,9 +87,11 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         listV = list;
         c = l;
         posts = new ArrayList<PostClass>();
+        dumper = new ArrayList<PostClass>();
         posts = flist;
     }
     public interface OnRefreshFinishListener {
+
         void onRefreshFinished();
     }
 
@@ -109,23 +114,36 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             }
             connection.disconnect();
             reader.close();
-            Log.d("reportM",buff.toString());
-            JArray = new JSONArray(buff.toString());
-            posts = new ArrayList<PostClass>();
-            getTenItem();
 
-            final ListAdapter adapter;
-            Queue<Integer> que = new LinkedList<Integer>();
-            if(c.equals(Main_men_fragment.class))
-                adapter = new NewFeed_Adapter(act,posts,que);
-            else
-                adapter = new historyAdapter(act,posts);
-            act.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    listV.setAdapter(adapter);
-                }
-            });
+            if(!buff.toString().equals("[]")) {
+                Log.d("refresh",buff.toString());
+                JArray = new JSONArray(buff.toString());
+                posts = new ArrayList<PostClass>();
+                final ListAdapter adapter;
+                Queue<Integer> que = new LinkedList<Integer>();
+                if (c.equals(Main_men_fragment.class))
+                    adapter = new NewFeed_Adapter(act, posts, que);
+                else
+                    adapter = new historyAdapter(act, posts);
+                act.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        listV.setAdapter(adapter);
+                        listV.setEnabled(false);
+                    }
+                });
+                getTenItem();
+            }
+            else {
+                act.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(act.getBaseContext(), "No post", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
 
 
         } catch (MalformedURLException e) {
@@ -146,44 +164,48 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     {
 
     }
-
-
-    public Bitmap getPicture(String picName,String fbName,int type) throws GeneralSecurityException, IOException {
-        //String URI = "https://storage.googleapis.com/" + "traffy_image/"+picName;
+    public Bitmap getPicture(String picName,String fbName,int type) {
         first = System.currentTimeMillis();
-      //  Log.d("picNmae",picName);
         String URI = "" ;
         if(type == 0)
             URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName+"640x640.jpg";
         else
             URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
-        Log.d("URI",URI);
-        GenericUrl url2 = new GenericUrl(URI);
-        HttpRequest get = Main_menu.requestFactory.buildGetRequest(url2);
-        HttpResponse response2 = get.execute();
-        final Bitmap bm = BitmapFactory.decodeStream(new BufferedInputStream((response2.getContent())));
-        response2.disconnect();
-        Log.d("Time",String.valueOf(System.currentTimeMillis()-first));
-        Log.d("getPic",String.valueOf(bm.getByteCount()));
+        Bitmap bm = null;
+        HttpResponse response2 = null;
+        while(true) {
+            GenericUrl url2 = new GenericUrl(URI);
+            try {
+                HttpRequest get = Main_menu.requestFactory.buildGetRequest(url2);
+                response2 = get.execute();
+                bm = BitmapFactory.decodeStream(new BufferedInputStream((response2.getContent())));
+                response2.disconnect();
+                break;
+            } catch (IOException e) {
+                URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
+                e.printStackTrace();
+            }
+        }
+
+        Log.d("Picture",String.valueOf(System.currentTimeMillis()-first));
         return bm;
     }
     public void getTenItem() throws JSONException, GeneralSecurityException, IOException {
+
+        ArrayList<PostClass> dummy = new ArrayList<PostClass>();
         int eraseIndex = -1;
         if(posts.size()!=0)
             eraseIndex = posts.size()-1;
-       /* if(posts.size()!=0 &&posts.get(posts.size()-1) ==null ) {
-            Log.d("ArraySize",String.valueOf(posts.size()));
-            eraseIndex = posts.size() - 1;
-        }*/
         for(int i = index ; i < index+5 && i<JArray.length();i++) {
-            Log.d("index",String.valueOf(i));
+           if(isCancelled()) {
+
+                return;
+            }
             JSONObject JObject = JArray.getJSONObject(i);
             String picture = URLEncoder.encode(JObject.getString("image_id"),"UTF8");
             String name = URLEncoder.encode(JObject.getString("name"),"UTF-8");
-            //int like = JObject.getInt("like");
             String content = JObject.getString("comment");
             String stat = JObject.getString("status");
-            Log.d("stat",stat);
             String problem = JObject.getString("problem_type");
             String time = JObject.getString("time_stamp");
              String faceBook = JObject.getString("facebook");
@@ -192,11 +214,15 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,problem);
             currentPost.setOwner(name);
             currentPost.setProfilePic(getPicture(faceBook,name,1));
-            posts.add(currentPost);
-            // re establish image url
+         //   posts.add(currentPost);
+            dummy.add(currentPost);
+
         }
+        posts.addAll(dummy);
+        dummy.clear();
         index = index +5;
-        posts.add(null);
+        if(index < JArray.length())
+            posts.add(null);
         if(eraseIndex!=-1)
             posts.remove(eraseIndex);
         act.runOnUiThread(new Runnable() {
@@ -205,16 +231,19 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 NewFeed_Adapter feedadapter = (NewFeed_Adapter)listV.getAdapter();
                 if(feedadapter!=null) {
                     feedadapter.notifyDataSetChanged();
+                    listV.setEnabled(true);
                 }
                 if(index >= JArray.length())
                     Main_men_fragment.flag_loading = true;
                 else
                     Main_men_fragment.flag_loading = false;
+
             }
         });
 
 
     }
+
 
 
 
