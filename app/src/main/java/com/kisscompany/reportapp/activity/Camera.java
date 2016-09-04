@@ -156,7 +156,6 @@ public class Camera extends AppCompatActivity {
                             }
                         });
                         send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
-                        Toast.makeText(Camera.this, "Done posting", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -270,6 +269,10 @@ public class Camera extends AppCompatActivity {
             chooseLocation.setText(location);
 
         }
+        else if(request_code == LOCATION_REQUEST&& result_code != RESULT_OK)/// result from facebook login
+        {
+            Log.d("not ok","not ok");
+        }
         else if(request_code == 7&& result_code == RESULT_OK)/// result from facebook login
         {
             Main_menu.loginFlag = 1;
@@ -280,6 +283,7 @@ public class Camera extends AppCompatActivity {
             Main_menu.id = LoginActivity.userName;
             Main_menu.profileUrl = LoginActivity.profilePicUrl;
         }
+
         else
         {
             Log.d("cancel","cancel");
