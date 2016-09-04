@@ -35,6 +35,7 @@ import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
 import com.kisscompany.reportapp.adapter.historyAdapter;
+import com.kisscompany.reportapp.frangment.History_fragment;
 import com.kisscompany.reportapp.frangment.Main_men_fragment;
 
 import org.json.JSONArray;
@@ -219,24 +220,44 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
         }
         posts.addAll(dummy);
+
         dummy.clear();
         index = index +5;
+
+        if(eraseIndex!=-1) {
+            posts.remove(eraseIndex);
+            for(PostClass l : posts)
+            {
+                Log.d("post",""+l.getDate());
+            }
+        }
         if(index < JArray.length())
             posts.add(null);
-        if(eraseIndex!=-1)
-            posts.remove(eraseIndex);
+
         act.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                NewFeed_Adapter feedadapter = (NewFeed_Adapter)listV.getAdapter();
-                if(feedadapter!=null) {
+                ArrayAdapter feedadapter;
+                if (c.equals(Main_men_fragment.class))
+                    feedadapter = (NewFeed_Adapter) listV.getAdapter();
+                else
+                    feedadapter = (historyAdapter) listV.getAdapter();
+                if (feedadapter != null) {
                     feedadapter.notifyDataSetChanged();
                     listV.setEnabled(true);
                 }
-                if(index >= JArray.length())
-                    Main_men_fragment.flag_loading = true;
-                else
-                    Main_men_fragment.flag_loading = false;
+                if (index >= JArray.length()) {
+                    if (c.equals(Main_men_fragment.class))
+                        Main_men_fragment.flag_loading = true;
+                    else
+                        History_fragment.hist_loading = true;
+                }
+                else {
+                    if (c.equals(Main_men_fragment.class))
+                        Main_men_fragment.flag_loading = false;
+                    else
+                        History_fragment.hist_loading = false;
+                }
 
             }
         });
