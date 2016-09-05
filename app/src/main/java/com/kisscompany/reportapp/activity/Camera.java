@@ -162,7 +162,6 @@ public class Camera extends AppCompatActivity {
                 else// if not login yet
                 {
                     Intent intent = new Intent(Camera.this,LoginActivity.class);
-                    intent.putExtra("key","0");
                     Toast.makeText(getBaseContext(),"Please login to facebook",Toast.LENGTH_SHORT).show();
                     startActivityForResult(intent,7);
                 }
@@ -205,8 +204,7 @@ public class Camera extends AppCompatActivity {
             inIm.setImageBitmap(resultImage);
 
         }
-        else if(request_code == Cam_request && result_code != RESULT_CANCELED){ ///result from camera
-
+        else if(request_code == Cam_request && result_code == RESULT_OK   ){ ///result from camera
           /*   final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(output.getAbsolutePath(),options);

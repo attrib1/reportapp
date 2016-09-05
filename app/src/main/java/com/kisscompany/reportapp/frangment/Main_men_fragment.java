@@ -60,7 +60,7 @@ public class Main_men_fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Main_menu.title.setText("New Feeds");
+        Main_menu.title.setText("รายงานใหม่");
         // Inflate the layout for this fragment
         Log.d("create","Create");
         View customView = inflater.inflate(R.layout.fragment_main_men_fragment,container,false);
@@ -89,6 +89,7 @@ public class Main_men_fragment extends Fragment {
                     }
                 });
                 feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=100&app_type=reportapp");
+
                 refresh.setEnabled(false);
             }
         };
@@ -109,37 +110,48 @@ public class Main_men_fragment extends Fragment {
                         if (offset == 0) {
 
                             refresh.setEnabled(true);
-                        } else
+                        }
+                        else
                             refresh.setEnabled(false);
                     }
                 }
-                else if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount!=0)
-                {
-                    if(flag_loading == false)
-                    {
-                        flag_loading = true;
+                else if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount!=0) {
 
-                        Log.d("newItem","new");
+                        if (flag_loading == false) {
+                            flag_loading = true;
+                            Log.d("newItem", "new");
+
                             Thread t = new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
-                                        feedInfo.getTenItem();
+                                        final Object waiter = 0;
+                                        if (feedInfo.getReady() == false) {
+                                            synchronized (waiter) {
+                                                waiter.wait();
+                                            }
+                                        }
+                                        feedInfo.addItem();
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     } catch (GeneralSecurityException e) {
                                         e.printStackTrace();
                                     } catch (IOException e) {
                                         e.printStackTrace();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
                                     }
                                 }
                             });
-                        t.start();
+                            t.start();
 
 
-                    }
+                        }
                 }
+                else
+                    refresh.setEnabled(false);
             }
+
         });
 
         refresh.post(new Runnable() {

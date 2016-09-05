@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class historyAdapter extends ArrayAdapter<PostClass> {
     TextView date,address,info;
-    ImageView img;
+    ImageView img,status;
     public historyAdapter(Context context, List<PostClass> list) {
         super(context, R.layout.history_layout,list );
     }
@@ -36,6 +36,7 @@ public class historyAdapter extends ArrayAdapter<PostClass> {
         }
         else {
             customView = inflater.inflate(R.layout.history_layout,parent,false);
+            status  = (ImageView)customView.findViewById(R.id.stat);
             date = (TextView) customView.findViewById(R.id.date);
             date.setText(getItem(position).getDate());
             address = (TextView) customView.findViewById(R.id.address);
@@ -44,8 +45,16 @@ public class historyAdapter extends ArrayAdapter<PostClass> {
             info.setText(getItem(position).getContent());
             img = (ImageView) customView.findViewById(R.id.smallincident);
             img.setImageBitmap(getItem(position).getPic());
+            status(getItem(position).getStatus());
 
         }
         return customView;
+    }
+    public void status(String state)
+    {
+        if(state.equals("report"))
+        {
+
+        }
     }
 }

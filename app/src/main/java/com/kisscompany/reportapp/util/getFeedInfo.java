@@ -79,7 +79,10 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     List<PostClass> posts;
     ArrayList<PostClass> dumper;
     Class c;
+    int eraseIndex = -1;
+    ArrayList<PostClass> dummy;
     int index = 0;
+    boolean ready = false;
     JSONArray JArray;
     long first;
     public getFeedInfo(Activity a,ListView list,Class l,List flist)
@@ -117,7 +120,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             reader.close();
 
             if(!buff.toString().equals("[]")) {
-                Log.d("refresh",buff.toString());
+
                 JArray = new JSONArray(buff.toString());
                 posts = new ArrayList<PostClass>();
                 final ListAdapter adapter;
@@ -134,6 +137,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                     }
                 });
                 getTenItem();
+                addItem();
             }
             else {
                 act.runOnUiThread(new Runnable() {
@@ -145,8 +149,6 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
 
             }
 
-
-
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -156,8 +158,6 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(mListener!=null)
-            mListener.onRefreshFinished();
         return null;
     }
     @Override
@@ -192,9 +192,8 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         return bm;
     }
     public void getTenItem() throws JSONException, GeneralSecurityException, IOException {
-
-        ArrayList<PostClass> dummy = new ArrayList<PostClass>();
-        int eraseIndex = -1;
+        dummy = new ArrayList<PostClass>();
+        eraseIndex = -1;
         if(posts.size()!=0)
             eraseIndex = posts.size()-1;
         for(int i = index ; i < index+5 && i<JArray.length();i++) {
@@ -214,16 +213,25 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             Bitmap BitmapPic = getPicture(picture,name,0);
             PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,problem);
             currentPost.setOwner(name);
+            currentPost.setStatus(stat);
             currentPost.setProfilePic(getPicture(faceBook,name,1));
          //   posts.add(currentPost);
             dummy.add(currentPost);
 
         }
-        posts.addAll(dummy);
+        ready = true;
+        Object noti = 0;
+        synchronized (noti)
+        {
+            noti.notifyAll();
+        }
 
+    }
+    public void addItem() throws IOException, GeneralSecurityException, JSONException {
+        posts.addAll(dummy);
+        ready = false;
         dummy.clear();
         index = index +5;
-
         if(eraseIndex!=-1) {
             posts.remove(eraseIndex);
             for(PostClass l : posts)
@@ -233,38 +241,42 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         }
         if(index < JArray.length())
             posts.add(null);
-
+        final ArrayAdapter feedadapter;
+        if (c.equals(Main_men_fragment.class))
+            feedadapter = (NewFeed_Adapter) listV.getAdapter();
+        else
+            feedadapter = (historyAdapter) listV.getAdapter();
         act.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ArrayAdapter feedadapter;
-                if (c.equals(Main_men_fragment.class))
-                    feedadapter = (NewFeed_Adapter) listV.getAdapter();
-                else
-                    feedadapter = (historyAdapter) listV.getAdapter();
+
                 if (feedadapter != null) {
                     feedadapter.notifyDataSetChanged();
-                    listV.setEnabled(true);
-                }
-                if (index >= JArray.length()) {
-                    if (c.equals(Main_men_fragment.class))
-                        Main_men_fragment.flag_loading = true;
-                    else
-                        History_fragment.hist_loading = true;
-                }
-                else {
-                    if (c.equals(Main_men_fragment.class))
-                        Main_men_fragment.flag_loading = false;
-                    else
-                        History_fragment.hist_loading = false;
+                  //  listV.setEnabled(true);
                 }
 
             }
         });
-
-
+        if (index >= JArray.length()) {
+            if (c.equals(Main_men_fragment.class))
+                Main_men_fragment.flag_loading = true;
+            else
+                History_fragment.hist_loading = true;
+        }
+        else {
+            if (c.equals(Main_men_fragment.class))
+                Main_men_fragment.flag_loading = false;
+            else
+                History_fragment.hist_loading = false;
+        }
+        if(mListener!=null)
+            mListener.onRefreshFinished();
+        getTenItem();
     }
-
+    public boolean getReady()
+    {
+        return ready;
+    }
 
 
 

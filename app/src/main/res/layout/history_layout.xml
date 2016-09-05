@@ -24,14 +24,17 @@
         android:layout_marginLeft="5dp" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView8"
-        android:layout_below="@+id/date"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:id="@+id/stat"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/abc_btn_check_to_on_mtrl_015"
-        android:layout_marginRight="10dp" />
+        android:src="@drawable/sands_of_time"
+
+
+        android:layout_marginRight="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/smallincident" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -42,8 +45,8 @@
         android:layout_alignLeft="@+id/date"
         android:layout_alignStart="@+id/date"
         android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@+id/imageView8"
-        android:layout_toStartOf="@+id/imageView8" />
+        android:layout_toLeftOf="@+id/stat"
+        android:layout_toStartOf="@+id/stat" />
 
     <TextView
         android:layout_width="wrap_content"

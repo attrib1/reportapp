@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
@@ -20,6 +21,9 @@ import com.kisscompany.reportapp.util.PostClass;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 
@@ -66,7 +70,15 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             typeImg.setImageDrawable(ResourcesCompat.getDrawable(con.getResources(),res,null));
             incident.setImageBitmap(getItem(position).getPic());
             text = (TextView) customView.findViewById(R.id.date);
-            text.setText(getItem(position).getDate());
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                Date d = format.parse(getItem(position).getDate());
+                DateUtils utils = new DateUtils();
+
+                text.setText(utils.getRelativeTimeSpanString(d.getTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             address = (TextView) customView.findViewById(R.id.location);
             address.setText(getItem(position).getAdress());
             descript = (TextView)customView.findViewById(R.id.comment);

@@ -68,6 +68,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.IOUtils;
 import com.google.api.services.storage.StorageScopes;
 import com.kisscompany.reportapp.R;
+import com.kisscompany.reportapp.frangment.History_fragment;
 import com.kisscompany.reportapp.frangment.Main_men_fragment;
 import com.kisscompany.reportapp.frangment.Noti_fragment;
 import com.kisscompany.reportapp.frangment.Report_fragment;
@@ -144,26 +145,27 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             e.printStackTrace();
         }
 
-        buildGoogleApiClient();//connect GPS
-        googleApiClient.connect();
+            buildGoogleApiClient();//connect GPS
+            googleApiClient.connect();
 
-        drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
+            drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
 
-        drawer.setClickable(true);
+            drawer.setClickable(true);
 
-        drawerList = (ListView)findViewById(R.id.navList);
-        final ArrayList<String> list = new ArrayList<String>();
-        if(loginFlag == 1)
-            list.add("Logout");
-        final ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
-        drawerList.setAdapter(adapter);
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(loginFlag == 1) {/// logout clear Preference iamge and text
-                    LoginManager.getInstance().logOut();
-                    profilePictureView.setProfileId(null);
-                    profileName.setText("Anonymous");
+            drawerList = (ListView)findViewById(R.id.navList);
+            final ArrayList<String> list = new ArrayList<String>();
+            if(loginFlag == 1)
+                list.add("Logout");
+            final ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
+            drawerList.setAdapter(adapter);
+            drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if(loginFlag == 1) {/// logout clear Preference iamge and text
+                        LoginManager.getInstance().logOut();
+                        profilePictureView.setProfileId(null);
+                        profileName.setText("Anonymous");
+                    profileString = "Anonymous";
                     SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit().clear();
                     editor.commit();
@@ -171,6 +173,12 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     list.remove(position);
                     ((ArrayAdapter)adapter).notifyDataSetChanged();
                     Toast.makeText(Main_menu.this, "Logout Complete", Toast.LENGTH_SHORT).show();
+                }
+                else// if not login yet
+                {
+                    Intent intent = new Intent(Main_menu.this,LoginActivity.class);
+                    Toast.makeText(getBaseContext(),"Please login to facebook",Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent,7);
                 }
                 drawer.closeDrawer(GravityCompat.START);
             }
@@ -197,9 +205,14 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                 if (drawer.isDrawerVisible(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
                 } else {
+                    list.clear();
                     if(loginFlag == 1) {
-                        list.clear();
+
                         list.add("Logout");
+                    }
+                    else
+                    {
+                        list.add("Login");
                     }
                     ((ArrayAdapter)adapter).notifyDataSetChanged();
                     drawer.openDrawer(GravityCompat.START);
@@ -255,6 +268,9 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                 Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
                 fg.refresher();//cancel loading api thread
                 fg.destroyCache();//destroy drawing cache
+             /*   Noti_fragment fg2 = (Noti_fragment) getSupportFragmentManager().findFragmentByTag("tab3");
+                if(fg2!=null)
+                ((History_fragment)fg2.getHistoryFragment()).refresher();*/
             }
 
         });
@@ -411,29 +427,21 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         super.onPostCreate(saveInstant);
         toggle.syncState();
     }
-   /* @Override
+    @Override
     protected void onActivityResult(int request_code,int result_code,Intent data)
     {
-        Log.d("chanzaa","chanzaa");
-        if(request_code == 7 && result_code == RESULT_OK)
+        if(request_code == 7&& result_code == RESULT_OK)/// result from facebook login
         {
-
-            Thread t=  new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        setProfilePic();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            t.start();
-            TextView name = (TextView)findViewById(R.id.userName);
-            name.setText(LoginActivity.facebookName);
+        Main_menu.loginFlag = 1;
+        setLoginFlag();
+        Main_menu.profilePictureView.setProfileId(LoginActivity.userName);
+        Main_menu.profileName.setText(LoginActivity.facebookName);
+        Main_menu.profileString = LoginActivity.facebookName;
+        Main_menu.id = LoginActivity.userName;
+        Main_menu.profileUrl = LoginActivity.profilePicUrl;
         }
         super.onActivityResult(request_code,result_code,data);
-    }*/
+    }
     public void setProfilePic() throws IOException {
         URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
         // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
@@ -483,11 +491,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         FileOutputStream out = new FileOutputStream(tempFile);
         IOUtils.copy(in, out);
         return tempFile; }
-    public void initSharePref()
-    {
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.login_status), Context.MODE_PRIVATE);
-    }
     public void getSharePref()
     {
         SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
@@ -505,6 +508,14 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                 profileString = sharedPref.getString("Name",null);
                 profileUrl = sharedPref.getString("profileUrl",null);
                 Log.d("profileUrl",profileUrl);
+                profileName.setText(profileString);
+
+            }
+            else{
+                id = null;
+                profilePictureView.setProfileId(id);
+                profileString = "Anonymous";
+                profileUrl = null;
                 profileName.setText(profileString);
 
             }
@@ -535,6 +546,17 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+    public void setLoginFlag()
+    {
+        SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.login_status), String.valueOf(Main_menu.loginFlag));
+        editor.putString("id",LoginActivity.userName);
+        editor.putString("Name",LoginActivity.facebookName);
+        editor.putString("profileUrl",LoginActivity.profilePicUrl);
+        Log.d("FBNAME",LoginActivity.facebookName);
+        editor.commit();
     }
 
 }

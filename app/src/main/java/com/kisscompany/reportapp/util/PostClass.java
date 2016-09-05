@@ -37,6 +37,7 @@ public class PostClass {
         return Content;
     }
     public String getStatus(){ return status; }
+    public void setStatus(String s){ status = s; }
     public int getLike(){ return like; }
     public long getPostID()
     {

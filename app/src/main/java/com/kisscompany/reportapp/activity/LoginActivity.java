@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
@@ -156,6 +157,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                                 progress.dismiss();
                                 setResult(RESULT_OK);
+                                Toast.makeText(getBaseContext(),"Login Complete",Toast.LENGTH_SHORT).show();
                                 finish();
 
                             } catch (Exception e) {
