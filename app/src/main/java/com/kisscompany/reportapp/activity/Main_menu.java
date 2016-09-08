@@ -265,7 +265,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
               //  tabHost.destroyDrawingCache();
                 setTabColor(tabHost);
                 Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
-              //  fg.refresher();//cancel loading api thread
+                fg.refresher();//cancel loading api thread
                 fg.destroyCache();//destroy drawing cache
              /*   Noti_fragment fg2 = (Noti_fragment) getSupportFragmentManager().findFragmentByTag("tab3");
                 if(fg2!=null)

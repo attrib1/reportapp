@@ -18,12 +18,14 @@ import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.historyAdapter;
+import com.kisscompany.reportapp.util.GetFeedInfos;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class History_fragment extends Fragment {
 
     ListView hisList;
     View histView;
-    getFeedInfo feedInfo;
+    GetFeedInfos feedInfo;
     SwipeRefreshLayout swipe;
     SwipeRefreshLayout.OnRefreshListener refreshListener;
     static public boolean hist_loading = false;
@@ -50,41 +52,6 @@ public class History_fragment extends Fragment {
         // Inflate the layout for this fragment
         histView = inflater.inflate(R.layout.fragment_history_fragment, container, false);
         hisList = (ListView)histView.findViewById(R.id.historyList);
-        swipe = (SwipeRefreshLayout)histView.findViewById(R.id.swipe);
-      //  swipe.setEnabled(false);
-        if(!Main_menu.profileString.equals("Anonymous")) {
-            hisList.setVisibility(View.VISIBLE);
-            swipe.setVisibility(View.VISIBLE);
-            swipe.setEnabled(true);
-        }
-        else {
-            hisList.setVisibility(View.INVISIBLE);
-            swipe.setVisibility(View.INVISIBLE);
-            swipe.setEnabled(false);
-            Toast.makeText(getContext(), "Please login to facebook", Toast.LENGTH_SHORT).show();
-        }
-        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipe.setEnabled(false);
-                List<PostClass> list = new ArrayList<PostClass>();
-                feedInfo = new getFeedInfo(getActivity(), hisList, History_fragment.class, list);
-                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?app_type=reportapp&facebook_id=" + Main_menu.id);
-                feedInfo.setCustomEventListener(new getFeedInfo.OnRefreshFinishListener() {
-                    @Override
-                    public void onRefreshFinished() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                swipe.setRefreshing(false);
-                            }
-                        });
-
-                    }
-                });
-            }
-        };
-        swipe.setOnRefreshListener(refreshListener);
         hisList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -95,26 +62,26 @@ public class History_fragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
                 if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount != 0) {
-                    if (hist_loading == false) {
+                    if (hist_loading== false) {
                         hist_loading = true;
-
-                        Log.d("newItem", "new");
                         Thread t = new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    final Object waiter = 0;
-                                    if (feedInfo.getReady() == false) {
-                                        synchronized (waiter) {
-                                            waiter.wait();
+                                    if(!feedInfo.isReady())
+                                    {
+                                        Object a = 0;
+                                        synchronized (a){
+                                            a.wait();
                                         }
                                     }
-                                    feedInfo.addItem();
+                                    feedInfo.addMoreFeed();
+                                    feedInfo.getMoreFeed();
+
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
-                                } catch (GeneralSecurityException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
+                                } catch (UnsupportedEncodingException e) {
                                     e.printStackTrace();
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
@@ -122,12 +89,61 @@ public class History_fragment extends Fragment {
                             }
                         });
                         t.start();
-
-
                     }
                 }
             }
         });
+        swipe = (SwipeRefreshLayout)histView.findViewById(R.id.swipe);
+        feedInfo = new GetFeedInfos(getActivity(),"http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?app_type=reportapp&facebook_id=" + Main_menu.id,History_fragment.class,hisList);///input api
+        feedInfo.setCustomEventListener(new GetFeedInfos.OnRefreshFinishListener() {
+            @Override
+            public void onRefreshFinished() {
+                if(getActivity()!=null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipe.setRefreshing(false);
+                        }
+                    });
+                }
+            }
+        });
+        swipe.setEnabled(false);
+        if(!Main_menu.profileString.equals("Anonymous")) {
+            hisList.setVisibility(View.VISIBLE);
+            swipe.setVisibility(View.VISIBLE);
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        feedInfo.getFeedJSONArray();
+                        feedInfo.getMoreFeed();
+                        feedInfo.addMoreFeed();
+                        feedInfo.getMoreFeed();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            t.start();
+        }
+        else {
+            hisList.setVisibility(View.INVISIBLE);
+            swipe.setVisibility(View.INVISIBLE);
+            swipe.setEnabled(false);
+            Toast.makeText(getContext(), "Please login to facebook", Toast.LENGTH_SHORT).show();
+        }
+        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+            }
+        };
+        swipe.setOnRefreshListener(refreshListener);
         return histView;
     }
     @Override
@@ -135,7 +151,7 @@ public class History_fragment extends Fragment {
     {
         Log.d("his","destroy");
         if(feedInfo!=null)
-            feedInfo.cancel(true);
+            feedInfo.cancel();
         super.onPause();
     }
     @Override
@@ -144,7 +160,6 @@ public class History_fragment extends Fragment {
         if(!Main_menu.profileString.equals("Anonymous")) {
             hisList.setVisibility(View.VISIBLE);
             swipe.setVisibility(View.VISIBLE);
-            swipe.setEnabled(true);
             swipe.post(new Runnable() {
                 @Override
                 public void run() {

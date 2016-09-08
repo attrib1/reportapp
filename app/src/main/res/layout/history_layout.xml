@@ -39,7 +39,7 @@
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:text="ถนนศรีอยุธยา"
         android:id="@+id/address"
         android:layout_alignTop="@+id/stat"
@@ -47,7 +47,6 @@
         android:layout_marginTop="0dp"
         android:layout_alignRight="@+id/date"
         android:layout_alignEnd="@+id/date"
-        android:layout_alignBottom="@+id/smallincident"
         android:layout_marginLeft="5dp" />
 
     <TextView

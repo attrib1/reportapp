@@ -59,7 +59,11 @@ public class GetFeedInfos {
         this.feedList = feedList;
         feeds = new ArrayList<PostClass>();
         newPosts = new ArrayList<PostClass>();
-        ListAdapter adapter = new NewFeed_Adapter(activity,feeds);
+        ListAdapter adapter;
+        if (c.equals(Main_men_fragment.class))
+            adapter = new NewFeed_Adapter(activity,feeds);
+        else
+            adapter = new historyAdapter(activity,feeds);
         feedList.setAdapter(adapter);
         this.activity = activity;
         urlString = u;
@@ -78,6 +82,8 @@ public class GetFeedInfos {
        // Log.d("recent",recentFeed.getDate()+" "+recentFeed.getFacebookID());
         synchronized (MONITOR_OBJECT) {//only allow one thread to update post
             for (int i = 0; i < JArray.length(); i++) {
+                if(isCancelled())
+                    return;
                 JSONObject JObject = JArray.getJSONObject(i);
                 String picture = URLEncoder.encode(JObject.getString("image_id"), "UTF8");
                 String name = URLEncoder.encode(JObject.getString("name"), "UTF-8");
@@ -122,6 +128,8 @@ public class GetFeedInfos {
     public void getMoreFeed() throws JSONException, UnsupportedEncodingException {///get more feed
         if(feeds.size()!=0)
             eraseIndex = feeds.size()-1;
+        if(JArray==null)
+            return;
         for(int i = lastPostIndex ; i < lastPostIndex+5 && i<JArray.length();i++) {
             if(isCancelled()) {
                 return;
@@ -141,6 +149,7 @@ public class GetFeedInfos {
             currentPost.setStatus(stat);
             currentPost.setProfilePic(getPicture(faceBook,name,1));
             //   posts.add(currentPost);
+            Log.d("notify","noti");
             newPosts.add(currentPost);
 
         }
@@ -151,9 +160,12 @@ public class GetFeedInfos {
         }
     }
     public void addMoreFeed() throws InterruptedException {///add more feed to the tail
+        if(JArray ==null||isCancelled())
+            return;
         synchronized (MONITOR_OBJECT) {///only allow one thread to update post at a time
             feeds.addAll(newPosts);
-            recentFeed = feeds.get(0);
+            if(feeds.size()!=0)
+                recentFeed = feeds.get(0);
             ready = false;
             newPosts.clear();
             lastPostIndex = lastPostIndex + 5;
@@ -167,7 +179,6 @@ public class GetFeedInfos {
                 feedadapter = (NewFeed_Adapter) feedList.getAdapter();
             else
                 feedadapter = (historyAdapter) feedList.getAdapter();
-            Log.d("notify","noti");
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
