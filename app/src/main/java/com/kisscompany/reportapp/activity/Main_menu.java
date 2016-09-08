@@ -104,7 +104,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     private static final int REQUEST_LOCATION = 0;
     private LocationRequest locationRequest;
     public static String lat="",lng="";
-    private boolean gps = true;
+    private boolean gps = false;
     ListView drawerList;
     public static int loginFlag = 0;
     final int RESULT_FALSE = 4;
@@ -125,13 +125,11 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
 
         setContentView(R.layout.activity_main_menu);
         Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
-        FacebookSdk.sdkInitialize(getApplicationContext());
+
       //  initSharePref();
       /* SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit().clear();
         editor.commit();*/
-
-        verifyStoragePermissions(this);
         profilePictureView = (ProfilePictureView) findViewById(R.id.avatar);
         profileName = (TextView)findViewById(R.id.userName);
         getSharePref();
@@ -144,7 +142,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         } catch (IOException e) {
             e.printStackTrace();
         }
-
             buildGoogleApiClient();//connect GPS
             googleApiClient.connect();
 
@@ -173,6 +170,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     list.remove(position);
                     ((ArrayAdapter)adapter).notifyDataSetChanged();
                     Toast.makeText(Main_menu.this, "Logout Complete", Toast.LENGTH_SHORT).show();
+                        tabHost.setCurrentTab(0);
+
                 }
                 else// if not login yet
                 {
@@ -226,7 +225,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         final TabHost.TabSpec tab1 = tabHost.newTabSpec("tab1");
         TabHost.TabSpec tab2 = tabHost.newTabSpec("tab2");
         TabHost.TabSpec tab3 = tabHost.newTabSpec("tab3");
-       // TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
+        TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
      //   TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
         TabHost.TabSpec tab6 = tabHost.newTabSpec("tab6");
 
@@ -240,8 +239,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         tab2.setIndicator(v2);
         tab3.setIndicator(v3);
 
-    /*    v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
-        tab4.setIndicator(v4);*/
+        v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
+        tab4.setIndicator(v4);
 
     /*    v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
         tab5.setIndicator(v5);
@@ -251,7 +250,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         tabHost.addTab(tab1,Main_men_fragment.class,null);
         tabHost.addTab(tab2,Report_fragment.class,null);
         tabHost.addTab(tab3,Noti_fragment.class,null);
-      //  tabHost.addTab(tab4,call_fragment.class,null);
+        tabHost.addTab(tab4,call_fragment.class,null);
      //   tabHost.addTab(tab5,twitt_fragment.class,null);
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
 
@@ -266,7 +265,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
               //  tabHost.destroyDrawingCache();
                 setTabColor(tabHost);
                 Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
-                fg.refresher();//cancel loading api thread
+              //  fg.refresher();//cancel loading api thread
                 fg.destroyCache();//destroy drawing cache
              /*   Noti_fragment fg2 = (Noti_fragment) getSupportFragmentManager().findFragmentByTag("tab3");
                 if(fg2!=null)
@@ -314,37 +313,40 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     }
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_LOCATION) {
+            Log.d("location","location");
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getLocationConnect();
+            } else {///exit
+                if(android.os.Build.VERSION.SDK_INT >= 21)
+                {
+                    finishAndRemoveTask();
+                }
+                else
+                {
+                    finish();
+                }
+            }
+        }
+        else if(requestCode == REQUEST_EXTERNAL_STORAGE){
+            Log.d("storage","storage");
+            if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {//exit
             } else {
-                // Permission was denied or request was cancelled
+                if(android.os.Build.VERSION.SDK_INT >= 21)
+                {
+                    finishAndRemoveTask();
+                }
+                else
+                {
+                    finish();
+                }
             }
         }
     }
     private void getLocationConnect() {
         //check runtime permission
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            if (Build.VERSION.SDK_INT >= 23) {
-
-                if
-                        (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    showMessageOKCancel("อนุญาตให้ App Traffy Bus เข้าถึงตำแหน่งปัจจุบันของคุณ",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (Build.VERSION.SDK_INT >= 23) {
-                                        requestPermissions(new
-                                                        String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                                REQUEST_LOCATION);
-                                    }
-                                }
-                            });
-                }
-            }
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION);
@@ -366,6 +368,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                 startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 return;
             }
+            verifyStoragePermissions(this);
 
 
         }
@@ -382,7 +385,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     }
     @Override
     public void onConnected(Bundle bundle) {
-        getLocationConnect();
+       getLocationConnect();
     }
 
     @Override
@@ -408,11 +411,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     }
     @Override
     public void onResume(){
-        Log.d("chanzaa","SDFsdfds");
-        if(gps == false) {
-            Log.d("chanzaa","in");
-            getLocationConnect();
-        }
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         super.onResume();
     }
     @Override
@@ -495,9 +495,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     {
         SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
         String flag = sharedPref.getString(getString(R.string.login_status),null);
-
+     //   Log.d("loginWoi",flag);
         if(flag !=null) {
-            Log.d("loginWoi",flag);
             loginFlag = Integer.parseInt(flag);
             if(loginFlag==1)
             {
@@ -524,6 +523,11 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         else{
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(getString(R.string.login_status), "0");
+            id = null;
+            profilePictureView.setProfileId(id);
+            profileString = "Anonymous";
+            profileUrl = null;
+            profileName.setText(profileString);
             editor.commit();
             loginFlag = 0;
         }

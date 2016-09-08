@@ -45,26 +45,11 @@ public class call_fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Main_menu.title.setText("เบอร์ดทรฉุกเฉิน ");
-        categoryView = inflater.inflate(R.layout.fragment_call_fragment, container, false);
-        catListView = (ListView) categoryView.findViewById(R.id.catList);
-        ((TextView)categoryView.findViewById(R.id.main_toolbar_title)).setText("Call");
+        Main_menu.title.setText("เกี่ยวกับแอพนี้");
+        categoryView = inflater.inflate(R.layout.about_layout, container, false);
 
 
-        ArrayList<Category> cList =getCat();
-        ListAdapter adapter = new categoryAdapter(getContext(),cList);
 
-        catListView.setAdapter(adapter);
-        catListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(),number_Activity.class);
-                Category cat = (Category)parent.getAdapter().getItem(position);
-                intent.putParcelableArrayListExtra("numberList",cat.getPhoneList());
-                intent.putExtra("title",cat.getText());
-                startActivity(intent);
-            }
-        });
 
         return categoryView;
     }

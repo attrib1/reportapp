@@ -4,17 +4,17 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:tag="ic_call"
+        android:tag="ic_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tabIcon"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/ic_call_gray" />
+        android:src="@drawable/ic_about" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Call"
+        android:text="แอพนี้"
         android:id="@+id/header"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

@@ -25,6 +25,8 @@ import android.widget.Toast;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.activity.Main_menu;
 import com.kisscompany.reportapp.adapter.NewFeed_Adapter;
+import com.kisscompany.reportapp.adapter.historyAdapter;
+import com.kisscompany.reportapp.util.GetFeedInfos;
 import com.kisscompany.reportapp.util.PostClass;
 import com.kisscompany.reportapp.util.getFeedInfo;
 
@@ -32,6 +34,7 @@ import org.json.JSONException;
 import org.mortbay.jetty.Main;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -42,20 +45,20 @@ import java.util.Queue;
  * A simple {@link Fragment} subclass.
  */
 public class Main_men_fragment extends Fragment {
-
+    int x = 0;
     ListView feed_list;
     DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
     SwipeRefreshLayout refresh;
     ArrayList<PostClass> list;
-    getFeedInfo feedInfo;
+    GetFeedInfos feedInfo;
     SwipeRefreshLayout.OnRefreshListener refreshListener;
     static public boolean flag_loading = false;
     List<PostClass> feeds;
+    int loading = 1;
     public Main_men_fragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,75 +71,116 @@ public class Main_men_fragment extends Fragment {
         refresh = (SwipeRefreshLayout)customView.findViewById(R.id.main_swipe);////refresh bar
         //refresh.setRefreshing(false);
         feed_list = (ListView)customView.findViewById(R.id.newFeedList);
+        feedInfo = new GetFeedInfos(getActivity(),"http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=100&app_type=reportapp",Main_men_fragment.class,feed_list);///input api
+        feedInfo.setCustomEventListener(new GetFeedInfos.OnRefreshFinishListener() {
+            @Override
+            public void onRefreshFinished() {
+                if(getActivity()!=null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            refresh.setRefreshing(false);
+                            refresh.setEnabled(true);
+                        }
+                    });
+                }
+            }
+        });
+        refresh.post(new Runnable() {
+            @Override
+            public void run() {
+                refresh.setRefreshing(true);
+                refresh.setEnabled(false);
+            }
+        });
 
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    feedInfo.getFeedJSONArray();
+                    feedInfo.getMoreFeed();
+                    feedInfo.addMoreFeed();
+                    feedInfo.getMoreFeed();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
         refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 //////refresh task
-                feedInfo = new getFeedInfo(getActivity(),feed_list,Main_men_fragment.class,feeds);///input api
-                feedInfo.setCustomEventListener(new getFeedInfo.OnRefreshFinishListener() {
+                Thread t = new Thread(new Runnable() {
                     @Override
-                    public void onRefreshFinished() {
-                        if(getActivity()!=null) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    refresh.setRefreshing(false);
-                                    refresh.setEnabled(true);
-                                }
-                            });
+                    public void run() {
+
+                        try {
+                            feedInfo.getFeedJSONArray();
+                            feedInfo.refreshFeed();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
                         }
                     }
                 });
-                feedInfo.execute("http://cloud.traffy.in.th/attapon/API/private_apis/get_report.php?limit=100&app_type=reportapp");
-
+                t.start();
                 refresh.setEnabled(false);
             }
         };
-        refresh.setOnRefreshListener(refreshListener);
+                            refresh.setOnRefreshListener(refreshListener);
 
-        feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                            feed_list.setOnScrollListener(new AbsListView.OnScrollListener( ) {
+                                @Override
+                                public void onScrollStateChanged(AbsListView view, int scrollState) {
 
-            }
+                                }
 
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem ==0){
-                    View v = feed_list.getChildAt(0);
-                    if(v!=null ) {
-                        int offset = v.getTop();
-                        if (offset == 0) {
+                                @Override
+                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                    if (firstVisibleItem ==0){
+                                        View v = feed_list.getChildAt(0);
+                                        if(v!=null ) {
+                                            int offset = v.getTop();
+                                            if (offset == 0) {
 
-                            refresh.setEnabled(true);
+                                                refresh.setEnabled(true);
                         }
                         else
                             refresh.setEnabled(false);
                     }
                 }
                 else if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount!=0) {
-
                         if (flag_loading == false) {
                             flag_loading = true;
-                            Log.d("newItem", "new");
-
                             Thread t = new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
-                                        final Object waiter = 0;
-                                        if (feedInfo.getReady() == false) {
-                                            synchronized (waiter) {
-                                                waiter.wait();
+
+                                        x++;
+                                        if(!feedInfo.isReady())
+                                        {
+                                            Object a = 0;
+                                            synchronized (a){
+                                                a.wait();
                                             }
                                         }
-                                        feedInfo.addItem();
+                                        feedInfo.addMoreFeed();
+
+                                        feedInfo.getMoreFeed();
+
+
                                     } catch (JSONException e) {
                                         e.printStackTrace();
-                                    } catch (GeneralSecurityException e) {
-                                        e.printStackTrace();
-                                    } catch (IOException e) {
+                                    } catch (UnsupportedEncodingException e) {
                                         e.printStackTrace();
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
@@ -144,7 +188,6 @@ public class Main_men_fragment extends Fragment {
                                 }
                             });
                             t.start();
-
 
                         }
                 }
@@ -154,13 +197,6 @@ public class Main_men_fragment extends Fragment {
 
         });
 
-        refresh.post(new Runnable() {
-            @Override public void run() {
-                refresh.setRefreshing(true);
-                refreshListener.onRefresh();
-            }
-        });
-        feed_list.setSmoothScrollbarEnabled(true);
 
         return customView;
     }
@@ -186,32 +222,7 @@ public class Main_men_fragment extends Fragment {
         Log.d("destroy","destroy");
         super.onDestroy();
     }
-   /* @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
 
-        if(refresh.isRefreshing() ==true)
-            outState.putString("refresh","true");
-        else
-            outState.putString("refresh","false");
-    }
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-       if (savedInstanceState != null) {
-
-            if(savedInstanceState.getString("refresh").equals("true"))
-            {
-                refresh.setRefreshing(true);
-            }
-        }
-    }
-*/
-    public void refresher()
-    {
-        feedInfo.cancel(true);
-    }
     public void setrefresh()
     {
         refresh.setRefreshing(true);

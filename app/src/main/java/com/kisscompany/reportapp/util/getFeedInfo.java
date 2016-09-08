@@ -85,6 +85,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     boolean ready = false;
     JSONArray JArray;
     long first;
+    final int REFRESH_FLAG = 0;
     public getFeedInfo(Activity a,ListView list,Class l,List flist)
     {
         act = a;
@@ -122,21 +123,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             if(!buff.toString().equals("[]")) {
 
                 JArray = new JSONArray(buff.toString());
-                posts = new ArrayList<PostClass>();
-                final ListAdapter adapter;
-                Queue<Integer> que = new LinkedList<Integer>();
-                if (c.equals(Main_men_fragment.class))
-                    adapter = new NewFeed_Adapter(act, posts, que);
-                else
-                    adapter = new historyAdapter(act, posts);
-                act.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        listV.setAdapter(adapter);
-                        listV.setEnabled(false);
-                    }
-                });
-                getTenItem();
+                getTenItem(REFRESH_FLAG);
                 addItem();
             }
             else {
@@ -187,11 +174,9 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 e.printStackTrace();
             }
         }
-
-        Log.d("Picture",String.valueOf(System.currentTimeMillis()-first));
         return bm;
     }
-    public void getTenItem() throws JSONException, GeneralSecurityException, IOException {
+    public void getTenItem(int flag) throws JSONException, GeneralSecurityException, IOException {
         dummy = new ArrayList<PostClass>();
         eraseIndex = -1;
         if(posts.size()!=0)
@@ -216,7 +201,12 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             currentPost.setStatus(stat);
             currentPost.setProfilePic(getPicture(faceBook,name,1));
          //   posts.add(currentPost);
-            dummy.add(currentPost);
+            if(posts.size()!=0) {
+                PostClass currenTop = posts.get(0);
+                if (currenTop.getFacebookID().equals(faceBook) && currenTop.getDate().equals(time))
+                    break;
+            }
+             dummy.add(currentPost);
 
         }
         ready = true;
@@ -225,19 +215,22 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         {
             noti.notifyAll();
         }
+        Log.d("post",""+dummy.size());
 
     }
     public void addItem() throws IOException, GeneralSecurityException, JSONException {
+
+        if(dummy.size()==0) {
+            if(mListener!=null)
+                mListener.onRefreshFinished();
+            return;
+        }
         posts.addAll(dummy);
         ready = false;
         dummy.clear();
         index = index +5;
         if(eraseIndex!=-1) {
             posts.remove(eraseIndex);
-            for(PostClass l : posts)
-            {
-                Log.d("post",""+l.getDate());
-            }
         }
         if(index < JArray.length())
             posts.add(null);
@@ -249,12 +242,10 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         act.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 if (feedadapter != null) {
                     feedadapter.notifyDataSetChanged();
-                  //  listV.setEnabled(true);
+                    //listV.setEnabled(true);
                 }
-
             }
         });
         if (index >= JArray.length()) {
@@ -271,7 +262,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         }
         if(mListener!=null)
             mListener.onRefreshFinished();
-        getTenItem();
+       // getTenItem();
     }
     public boolean getReady()
     {

@@ -106,7 +106,6 @@ public class getFourSquare extends AsyncTask<String,String,String> {
             }
         } catch (Exception e) {
         e.printStackTrace();
-        return new ArrayList();
         }
         return temp;
 

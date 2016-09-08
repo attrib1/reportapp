@@ -1,27 +1,17 @@
 package com.kisscompany.reportapp.activity;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -32,31 +22,19 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.facebook.login.widget.ProfilePictureView;
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.util.PostClass;
-import com.kisscompany.reportapp.util.getFeedInfo;
 import com.kisscompany.reportapp.util.sendFeedInfo;
-import com.kisscompany.reportapp.util.uploadImageGoogle;
 import com.soundcloud.android.crop.Crop;
 import com.soundcloud.android.crop.CropImageActivity;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import io.fabric.sdk.android.Fabric;
 
 
 public class Camera extends AppCompatActivity {
@@ -69,7 +47,7 @@ public class Camera extends AppCompatActivity {
     ImageView colorTab;
     HorizontalScrollView scroll;
     static final int Cam_request = 1;
-
+    TouchedView touch;
     String color = null;
     String pic = null;
     ImageView inIm;
@@ -102,8 +80,13 @@ public class Camera extends AppCompatActivity {
             camera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
             startActivityForResult(camera,Cam_request);
         }
+        touch = (TouchedView)findViewById(R.id.touchView);
+        touch.getLayoutParams().height = widthInDP;
+        touch.bringToFront();
+    //    touch.setVisibility(View.INVISIBLE);
         scroll = (HorizontalScrollView)findViewById(R.id.Actype);
         scroll.requestFocus();
+
         chooseLocation = (TextView)findViewById(R.id.chooseLocation);
         chooseLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,6 +105,7 @@ public class Camera extends AppCompatActivity {
                 return false;
             }
         });
+        info.setVisibility(View.INVISIBLE);
         cancel = (TextView)findViewById(R.id.cancelButt);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,8 +185,9 @@ public class Camera extends AppCompatActivity {
                 default:
                     break;
             }
+            //resultImage= resultImage.copy(Bitmap.Config.ARGB_8888, true);
             inIm.setImageBitmap(resultImage);
-
+            touch.setBitmap(resultImage);
         }
         else if(request_code == Cam_request && result_code == RESULT_OK   ){ ///result from camera
           /*   final BitmapFactory.Options options = new BitmapFactory.Options();

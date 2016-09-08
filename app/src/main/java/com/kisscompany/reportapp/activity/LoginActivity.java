@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.d("cancel","cancel10");
         progress = new ProgressDialog(this);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {

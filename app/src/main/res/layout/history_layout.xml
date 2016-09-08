@@ -8,55 +8,58 @@
         android:layout_height="70dp"
         android:id="@+id/smallincident"
         android:src="@drawable/test_profile"
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginBottom="5dp" />
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:text="วันที่ 29 สิงหาคม 2559"
-        android:layout_gravity="center"
+        android:text="12 ชั่วโมงที่ผ่านมา"
+        android:textAlignment="center"
         android:id="@+id/date"
         android:layout_alignTop="@+id/smallincident"
-        android:layout_toRightOf="@+id/smallincident"
-        android:layout_toEndOf="@+id/smallincident"
-        android:layout_marginLeft="5dp" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:layout_toRightOf="@+id/statusText"
+        android:layout_toEndOf="@+id/statusText" />
 
     <ImageView
         android:layout_width="30dp"
-        android:layout_height="match_parent"
+        android:layout_height="30dp"
         android:id="@+id/stat"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/sands_of_time"
+        android:src="@drawable/location_icon"
 
 
-        android:layout_marginRight="10dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignBottom="@+id/smallincident" />
+        android:layout_below="@+id/statusText"
+        android:layout_alignLeft="@+id/statusText"
+        android:layout_alignStart="@+id/statusText"
+        android:layout_marginTop="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ถนนศรีอยุธยา"
         android:id="@+id/address"
-        android:layout_below="@+id/date"
-        android:layout_alignLeft="@+id/date"
-        android:layout_alignStart="@+id/date"
-        android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@+id/stat"
-        android:layout_toStartOf="@+id/stat" />
+        android:layout_alignTop="@+id/stat"
+        android:layout_toRightOf="@+id/stat"
+        android:layout_marginTop="0dp"
+        android:layout_alignRight="@+id/date"
+        android:layout_alignEnd="@+id/date"
+        android:layout_alignBottom="@+id/smallincident"
+        android:layout_marginLeft="5dp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:text="ถนนชำรุด"
-        android:id="@+id/infotext"
-        android:layout_below="@+id/address"
-        android:layout_alignLeft="@+id/address"
-        android:layout_alignStart="@+id/address"
-        android:layout_marginTop="5dp"
-        android:layout_alignRight="@+id/address"
-        android:layout_alignEnd="@+id/address" />
+        android:text="กำลังดำเนินการ"
+        android:id="@+id/statusText"
+        android:background="#000000"
+        android:textAlignment="center"
+        android:layout_alignTop="@+id/smallincident"
+        android:layout_toRightOf="@+id/smallincident"
+        android:layout_toEndOf="@+id/smallincident"
+        android:layout_marginLeft="10dp" />
+
 </RelativeLayout>

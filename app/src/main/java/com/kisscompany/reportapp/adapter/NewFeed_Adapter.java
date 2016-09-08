@@ -38,14 +38,13 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
     int res;
     Context con;
     Queue<Integer> visibleQueue;
-    public NewFeed_Adapter(Context context, List<PostClass> list, Queue<Integer> v) {
+    public NewFeed_Adapter(Context context, List<PostClass> list) {
         super(context, R.layout.newfeed_layout,list);
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dm);
         widthInDP = Math.round(dm.widthPixels);
         con = context;
-        visibleQueue = v;
 
     }
     @Override
@@ -66,19 +65,19 @@ public class NewFeed_Adapter extends ArrayAdapter<PostClass> {
             incident.getLayoutParams().height = widthInDP;
             typeImg = (ImageView)customView.findViewById(R.id.typeImage);///impliment click to hide image
             int res = con.getResources().getIdentifier(getItem(position).getType(),"drawable", getContext().getPackageName());
-            Log.d("id",getItem(position).getType());
             typeImg.setImageDrawable(ResourcesCompat.getDrawable(con.getResources(),res,null));
             incident.setImageBitmap(getItem(position).getPic());
             text = (TextView) customView.findViewById(R.id.date);
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");///get time span
             try {
                 Date d = format.parse(getItem(position).getDate());
                 DateUtils utils = new DateUtils();
-
                 text.setText(utils.getRelativeTimeSpanString(d.getTime()));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
             address = (TextView) customView.findViewById(R.id.location);
             address.setText(getItem(position).getAdress());
             descript = (TextView)customView.findViewById(R.id.comment);

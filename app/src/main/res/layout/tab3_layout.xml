@@ -4,17 +4,17 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:tag="ic_bell"
+        android:tag="ic_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tabIcon"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/ic_bell_gray" />
+        android:src="@drawable/ic_profile_gray" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="รายงานของฉัน"
+        android:text="ของฉัน"
         android:id="@+id/header"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>
