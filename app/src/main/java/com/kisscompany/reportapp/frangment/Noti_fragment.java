@@ -50,6 +50,13 @@ public class Noti_fragment extends Fragment {
     {
         return history_fragment;
     }
+    @Override
+    public void onDestroy(){
+        Log.d("Destroy","destroy");
+        ((History_fragment)getHistoryFragment()).refresher();
+        super.onDestroy();
+
+    }
 
 
 }

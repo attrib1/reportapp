@@ -39,12 +39,10 @@ import java.util.Date;
 
 public class Camera extends AppCompatActivity {
 
-    String imageLocation;
     String location = null;
     int widthInDP;
-    TextView send,typeText,cancel;
+    TextView send,cancel;
     File output;
-    ImageView colorTab;
     HorizontalScrollView scroll;
     static final int Cam_request = 1;
     TouchedView touch;
@@ -56,8 +54,6 @@ public class Camera extends AppCompatActivity {
     View currentType = null;
     Bitmap resultImage;
     final int LOCATION_REQUEST = 3;
-    final String CLIENT_ID = "CWIB5QARTPRLLQIVCYKM5MVXYSQCRGYM1VZ31AJ4DCIMKEJ";
-    final String CLIENT_SECRET = "4SDDGS3PYQ5JQOX4WU0XJTXAKH1HSHEFQ1I21V4KHDR15PG";
     String exifOrientation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,11 +162,6 @@ public class Camera extends AppCompatActivity {
             wm.getDefaultDisplay().getMetrics(dm);
             widthInDP = Math.round(dm.widthPixels);
             inIm.getLayoutParams().height = widthInDP;
-           /* final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(output.getAbsolutePath(),options);
-            options.inSampleSize = calculateInSampleSize(options, 640,640);
-            options.inJustDecodeBounds = false;*/
              resultImage = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(output.getAbsolutePath()), 640, 640, true);
             switch(exifOrientation) {
                 case "6":
@@ -190,18 +181,6 @@ public class Camera extends AppCompatActivity {
             touch.setBitmap(resultImage);
         }
         else if(request_code == Cam_request && result_code == RESULT_OK   ){ ///result from camera
-          /*   final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(output.getAbsolutePath(),options);
-            options.inSampleSize = 5;
-            options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeFile(output.getAbsolutePath(),options);
-            try {
-                FileOutputStream fileout = new FileOutputStream(output);
-                bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileout);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
             Log.d("result_code","result = "+result_code);
             ExifInterface ei = null;
             try {
@@ -212,30 +191,7 @@ public class Camera extends AppCompatActivity {
             }
             exifOrientation = ei
                     .getAttribute(ExifInterface.TAG_ORIENTATION);
-            //Bitmap bitmap = BitmapFactory.decodeFile(output.getAbsolutePath());
-       /*     Log.d("Orient",exifOrientation);
-            switch(exifOrientation) {
-                case "6":
-                    bitmap = rotateImage(bitmap, 90);
-                    break;
-                case "3":
-                    bitmap =rotateImage(bitmap, 180);
-                    break;
-                case "8":
-                    bitmap = rotateImage(bitmap, 270);
-                    break;
-                default:
-                    break;
-            }
-            try {
-                FileOutputStream fileout = new FileOutputStream(output);
-                bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileout);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
             Crop.of(Uri.fromFile(output),Uri.fromFile(output)).asSquare().start(this);
-
-           // Log.d("ImageSize",String.valueOf(output.length()));
         }
         else if(request_code == LOCATION_REQUEST && result_code ==RESULT_OK)//result from choose location OK
         {
@@ -316,12 +272,6 @@ public class Camera extends AppCompatActivity {
         }
 
         return inSampleSize;
-    }
-    public void hideSoftKeyboard() {
-        if(getCurrentFocus()!=null) {
-            InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        }
     }
     public void Upload()
     {

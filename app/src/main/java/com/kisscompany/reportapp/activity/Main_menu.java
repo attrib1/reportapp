@@ -122,7 +122,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         //Fabric.with(this, new Crashlytics());
         // TODO: Move this to where you establish a user session
 
-
         setContentView(R.layout.activity_main_menu);
         Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
 
@@ -132,8 +131,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         editor.commit();*/
         profilePictureView = (ProfilePictureView) findViewById(R.id.avatar);
         profileName = (TextView)findViewById(R.id.userName);
-        getSharePref();
-        //setSupportActionBar(tool);
+        getSharePref();//get old login status
         try {
             requestFactory = getCredential();
             Log.d("cancel","cancel");
@@ -198,7 +196,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         toggle.setDrawerIndicatorEnabled(false);
         toggle.setHomeAsUpIndicator(ResourcesCompat.getDrawable(getResources(),re,null));
         title = (TextView)findViewById(R.id.main_toolbar_title);
-        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {///when slide bar is toggled
             @Override
             public void onClick(View v) {
                 if (drawer.isDrawerVisible(GravityCompat.START)) {
@@ -257,19 +255,11 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             @Override
             public void onTabChanged(String arg0) {
 
-              /*  if(tabHost.getCurrentTab() == 1)
-                {
-                    Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivity(camera);
-                }*/
-              //  tabHost.destroyDrawingCache();
                 setTabColor(tabHost);
                 Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
                 fg.refresher();//cancel loading api thread
                 fg.destroyCache();//destroy drawing cache
-             /*   Noti_fragment fg2 = (Noti_fragment) getSupportFragmentManager().findFragmentByTag("tab3");
-                if(fg2!=null)
-                ((History_fragment)fg2.getHistoryFragment()).refresher();*/
+
             }
 
         });

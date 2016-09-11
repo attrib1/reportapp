@@ -109,6 +109,12 @@ public class History_fragment extends Fragment {
             }
         });
         swipe.setEnabled(false);
+        swipe.post(new Runnable() {
+            @Override
+            public void run() {
+                swipe.setRefreshing(true);
+            }
+        });
         if(!Main_menu.profileString.equals("Anonymous")) {
             hisList.setVisibility(View.VISIBLE);
             swipe.setVisibility(View.VISIBLE);
@@ -149,27 +155,16 @@ public class History_fragment extends Fragment {
     @Override
     public void onPause()
     {
-        Log.d("his","destroy");
-        if(feedInfo!=null)
-            feedInfo.cancel();
+      //  feedInfo.cancel();
         super.onPause();
     }
     @Override
     public void onResume()
     {
-        if(!Main_menu.profileString.equals("Anonymous")) {
-            hisList.setVisibility(View.VISIBLE);
-            swipe.setVisibility(View.VISIBLE);
-            swipe.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipe.setRefreshing(true);
-                    refreshListener.onRefresh();
-                }
-            });
-        }
         super.onResume();
     }
-
+    public void refresher(){
+        feedInfo.cancel();
+    }
 
 }

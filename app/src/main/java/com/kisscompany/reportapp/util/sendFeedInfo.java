@@ -153,7 +153,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
                 try {
                     Thread.sleep(100);
                     putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
-                    response = putRequest.execute();
+                   response = putRequest.execute();
                     response.disconnect();
                     return true;
                 } catch (IOException e) {
@@ -186,20 +186,14 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         byte[] b = new byte[0];
         HttpContent contentsend = new ByteArrayContent("image/jpeg", b);
         HttpRequest putRequest;
-        putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
+       putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
         HttpResponse response = putRequest.execute();
-        //  String content = response.parseAsString();
-        //   Log.d("debug", "response is:"+response.getStatusCode());
-        //   Log.d("debug", "response content is:"+content);
+          String content = response.parseAsString();
+           Log.d("debug", "response is:"+response.getStatusCode());
+          Log.d("debug", "response content is:"+content);
         response.disconnect();
     }
-    public void checkResize() throws IOException {
 
-        String    URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName+"640x640.jpg";
-        GenericUrl url2 = new GenericUrl(URI);
-        HttpRequest get = Main_menu.requestFactory.buildGetRequest(url2);
-        HttpResponse response2 = get.execute();
-    }
     @Override
     public void onPostExecute(String result)
     {

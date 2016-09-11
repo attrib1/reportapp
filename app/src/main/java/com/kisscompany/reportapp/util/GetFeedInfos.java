@@ -144,6 +144,8 @@ public class GetFeedInfos {
             String faceBook = JObject.getString("facebook");
             String address = JObject.getString("address");
             Bitmap BitmapPic = getPicture(picture,name,0);
+            if(BitmapPic ==null)
+                continue;
             PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,problem);
             currentPost.setOwner(name);
             currentPost.setStatus(stat);
@@ -204,9 +206,6 @@ public class GetFeedInfos {
                History_fragment.hist_loading = false;
        }
     }
-    public void addNewFeed(){
-
-    }
     public void getFeedJSONArray()
     {
         try {
@@ -243,21 +242,25 @@ public class GetFeedInfos {
         else
             URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
         Bitmap bm = null;
-        HttpResponse response2 = null;
-        while(true) {
-            GenericUrl url2 = new GenericUrl(URI);
+        long timestamp = System.currentTimeMillis();
+        while(System.currentTimeMillis() - timestamp < 5000) {
             try {
-                HttpRequest get = Main_menu.requestFactory.buildGetRequest(url2);
-                response2 = get.execute();
-                bm = BitmapFactory.decodeStream(new BufferedInputStream((response2.getContent())));
-                response2.disconnect();
+                Thread.sleep(50);
+                URI = URI.replace("+","%20");
+                Log.d("URI",URI);
+                URL url = new URL(URI);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                bm = BitmapFactory.decodeStream(new BufferedInputStream(connection.getInputStream()));
+                connection.disconnect();
                 break;
             } catch (IOException e) {
                 URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-
+        Log.d("PASS","PASSSSSS");
         return bm;
     }
     public boolean isCancelled()

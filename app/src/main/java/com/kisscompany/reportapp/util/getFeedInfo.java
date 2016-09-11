@@ -123,7 +123,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
             if(!buff.toString().equals("[]")) {
 
                 JArray = new JSONArray(buff.toString());
-                getTenItem(REFRESH_FLAG);
+         //       getTenItem(REFRESH_FLAG);
                 addItem();
             }
             else {
@@ -152,7 +152,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
     {
 
     }
-    public Bitmap getPicture(String picName,String fbName,int type) {
+  /*  public Bitmap getPicture(String picName,String fbName,int type) {
         first = System.currentTimeMillis();
         String URI = "" ;
         if(type == 0)
@@ -174,9 +174,9 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
                 e.printStackTrace();
             }
         }
-        return bm;
-    }
-    public void getTenItem(int flag) throws JSONException, GeneralSecurityException, IOException {
+        return bm
+    }*/
+  /*  public void getTenItem(int flag) throws JSONException, GeneralSecurityException, IOException {
         dummy = new ArrayList<PostClass>();
         eraseIndex = -1;
         if(posts.size()!=0)
@@ -217,7 +217,7 @@ public class getFeedInfo extends AsyncTask<String,String,String> {
         }
         Log.d("post",""+dummy.size());
 
-    }
+    }*/
     public void addItem() throws IOException, GeneralSecurityException, JSONException {
 
         if(dummy.size()==0) {

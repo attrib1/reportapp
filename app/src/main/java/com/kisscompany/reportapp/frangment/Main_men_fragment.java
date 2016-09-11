@@ -202,12 +202,6 @@ public class Main_men_fragment extends Fragment {
     }
     @Override
     public void onPause(){
-       // refresh.setRefreshing(false);
-       /* if (refresh!=null) {
-           refresh.setRefreshing(false);
-            refresh.destroyDrawingCache();
-            refresh.clearAnimation();
-        }*/
         super.onPause();
     }
     @Override
@@ -221,11 +215,6 @@ public class Main_men_fragment extends Fragment {
     {
         Log.d("destroy","destroy");
         super.onDestroy();
-    }
-
-    public void setrefresh()
-    {
-        refresh.setRefreshing(true);
     }
     public void destroyCache()
     {
