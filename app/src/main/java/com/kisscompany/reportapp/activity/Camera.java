@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
@@ -48,13 +50,15 @@ public class Camera extends AppCompatActivity {
     TouchedView touch;
     String color = null;
     String pic = null;
-    ImageView inIm;
+    ImageView inIm,sticker;
     TextView info,chooseLocation;
     ProgressDialog progress;
     View currentType = null;
     Bitmap resultImage;
     final int LOCATION_REQUEST = 3;
     String exifOrientation;
+    float dx,dy;
+    float x,y;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,12 +66,14 @@ public class Camera extends AppCompatActivity {
 
         Main_menu.title.setText("เลือกประเภท");
 
+
+
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dm);
         widthInDP = Math.round(dm.widthPixels);
 
-        if(savedInstanceState == null) {
+  //      if(savedInstanceState == null) {
             // everything else that doesn't update UI
             Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             File dir=
@@ -75,11 +81,11 @@ public class Camera extends AppCompatActivity {
             output=new File(dir, "CameraContentDemo.jpeg");
             camera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
             startActivityForResult(camera,Cam_request);
-        }
+     //   }
+        sticker = (ImageView)findViewById(R.id.sticker);
         touch = (TouchedView)findViewById(R.id.touchView);
         touch.getLayoutParams().height = widthInDP;
         touch.bringToFront();
-    //    touch.setVisibility(View.INVISIBLE);
         scroll = (HorizontalScrollView)findViewById(R.id.Actype);
         scroll.requestFocus();
 
@@ -101,7 +107,6 @@ public class Camera extends AppCompatActivity {
                 return false;
             }
         });
-        info.setVisibility(View.INVISIBLE);
         cancel = (TextView)findViewById(R.id.cancelButt);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +117,40 @@ public class Camera extends AppCompatActivity {
 
             }
         });
+        touch.setEnabled(false);
+        touch.setVisibility(View.INVISIBLE);
+      /*  inIm.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        sticker.setEnabled(true);
+                        sticker.setVisibility(View.VISIBLE);
+                        Log.d("touched",""+sticker.getScaleX()+" "+sticker.getScaleY());
+
+                        x = event.getX()+v.getX()-(float)sticker.getWidth()/2;
+                        y = event.getY()+v.getY()-(float)sticker.getHeight()/2;
+                        if(x < v.getWidth()-sticker.getWidth()&& x >= 0 && y < v.getY()+v.getHeight()-sticker.getHeight() && y > v.getY()) {
+                            sticker.setX(x);
+                            sticker.setY(y);
+                        }
+                        dx = x-v.getX();
+                        dy = y-v.getY();
+                    }
+                    break;
+                    case MotionEvent.ACTION_MOVE: {
+                    }
+                    break;
+                    case MotionEvent.ACTION_UP: {
+
+                        //your stuff
+                    }
+                }
+
+                return false;
+            }
+        });*/
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,7 +219,7 @@ public class Camera extends AppCompatActivity {
             inIm.setImageBitmap(resultImage);
             touch.setBitmap(resultImage);
         }
-        else if(request_code == Cam_request && result_code == RESULT_OK   ){ ///result from camera
+        else if(request_code == Cam_request && result_code == RESULT_OK && output.getAbsolutePath()!=null ){ ///result from camera
             Log.d("result_code","result = "+result_code);
             ExifInterface ei = null;
             try {
@@ -284,6 +323,8 @@ public class Camera extends AppCompatActivity {
     }
     public PostClass createPost()
     {
+       // Bitmap b = ((BitmapDrawable)sticker.getDrawable()).getBitmap();
+        //resultImage = createSingleImageFromMultipleImages(resultImage,Bitmap.createScaledBitmap(b,b.getWidth()/2,b.getHeight()/2,false));
         PostClass newPost = new PostClass(resultImage,getDate() ,chooseLocation.getText().toString(),info.getText().toString(),"ID5580907",pic);
 
         return newPost;
@@ -334,6 +375,13 @@ public class Camera extends AppCompatActivity {
         editor.putString("profileUrl",LoginActivity.profilePicUrl);
         Log.d("FBNAME",LoginActivity.facebookName);
         editor.commit();
+    }
+    private Bitmap createSingleImageFromMultipleImages(Bitmap firstImage, Bitmap secondImage) {
+        Bitmap result = Bitmap.createBitmap(firstImage.getWidth(), firstImage.getHeight(), firstImage.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(firstImage, 0f, 0f, null);
+        canvas.drawBitmap(secondImage, dx, dy, null);
+        return result;
     }
 
 }

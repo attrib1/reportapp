@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.activity.Main_menu;
@@ -24,7 +25,7 @@ public class Noti_fragment extends Fragment {
 
     ViewPager viewPager;
     View notiView;
-    History_fragment history_fragment;
+    History_fragment history_fragment = null;
     public Noti_fragment() {
         // Required empty public constructor
     }
@@ -37,23 +38,28 @@ public class Noti_fragment extends Fragment {
         Main_menu.title.setText("ประวัติการรายงาน");
         notiView = inflater.inflate(R.layout.fragment_noti_fragment, container, false);
         viewPager = (ViewPager)notiView.findViewById(R.id.noti_pager);
-        List<Fragment> listFragment = new ArrayList<Fragment>();
-        history_fragment = new History_fragment();
-        listFragment.add(history_fragment);
-        listFragment.add(new picture_Fragment());
-        fragmentPagerAdapter adapter = new fragmentPagerAdapter(getChildFragmentManager() ,listFragment);
-        viewPager.setAdapter( adapter);
-        Log.d("create","again");
+        if(Main_menu.profileString.equals("Anonymous"))
+        {
+            Toast.makeText(getContext(), "Please login to facebook", Toast.LENGTH_SHORT).show();
+
+        }
+        else {
+            List<Fragment> listFragment = new ArrayList<Fragment>();
+            history_fragment = new History_fragment();
+            listFragment.add(history_fragment);
+            listFragment.add(new picture_Fragment());
+            fragmentPagerAdapter adapter = new fragmentPagerAdapter(getChildFragmentManager(), listFragment);
+            viewPager.setAdapter(adapter);
+            Log.d("create", "again");
+        }
         return notiView;
     }
-    public Fragment getHistoryFragment()
-    {
-        return history_fragment;
-    }
+
     @Override
     public void onDestroy(){
         Log.d("Destroy","destroy");
-        ((History_fragment)getHistoryFragment()).refresher();
+        if(history_fragment != null)
+            history_fragment.refresher();
         super.onDestroy();
 
     }

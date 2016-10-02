@@ -137,12 +137,6 @@ public class History_fragment extends Fragment {
             });
             t.start();
         }
-        else {
-            hisList.setVisibility(View.INVISIBLE);
-            swipe.setVisibility(View.INVISIBLE);
-            swipe.setEnabled(false);
-            Toast.makeText(getContext(), "Please login to facebook", Toast.LENGTH_SHORT).show();
-        }
         refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

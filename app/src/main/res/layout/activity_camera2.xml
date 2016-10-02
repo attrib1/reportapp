@@ -7,102 +7,15 @@
     android:layout_height="match_parent"
 
     tools:context="com.kisscompany.reportapp.activity.Camera">
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar3"
-        android:minHeight="?attr/actionBarSize"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:titleTextColor="@android:color/white"
-        app:contentInsetStart="0dp"
-        app:contentInsetEnd="0dp"
-        app:contentInsetLeft="0dp"
-        app:contentInsetRight="0dp"
-        android:clipToPadding="false"
-        android:background="#3d70b6">
-        <LinearLayout
-            android:id="@+id/main_toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/main_toolbar_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:textColor="#ffffff"
-                android:text="เลือกปัญหา" />
-        </LinearLayout>
-    </android.support.v7.widget.Toolbar>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:id="@+id/Actype"
-
-        android:fillViewport="false"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/toolbar3"
-        android:layout_alignParentStart="true">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:id="@+id/type1"
-                android:tag="ic_pedestrian"
-                android:src="@drawable/ic_pedestrian"
-                android:onClick="Click"
-                android:paddingLeft="5dp"
-                android:paddingTop="5dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="5dp"
-                android:padding="5dp" />
-
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:tag="ic_fire"
-                android:layout_marginLeft="0dp"
-                android:id="@+id/type2"
-                android:src="@drawable/ic_fire"
-                android:onClick="Click"
-                android:padding="5dp" />
-
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:id="@+id/type3"
-                android:tag="ic_flood"
-                android:src="@drawable/ic_flood"
-                android:onClick="Click"
-                android:padding="5dp" />
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:tag="ic_accident"
-                android:id="@+id/type4"
-                android:src="@drawable/ic_accident"
-                android:nestedScrollingEnabled="false"
-                android:onClick="Click"
-                android:padding="5dp" />
-        </LinearLayout>
-        </HorizontalScrollView>
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
 
-
         android:id="@+id/relativeLayout"
         android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/Actype"
-        android:layout_alignStart="@+id/Actype">
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -129,63 +42,152 @@
             android:layout_alignTop="@+id/sendTxt" />
 
     </RelativeLayout>
+
+
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/tempImg"
-        android:layout_below="@+id/Actype"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-    <com.kisscompany.reportapp.activity.TouchedView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/touchView"
+        android:id="@+id/sticker"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/tempImg"
-        android:layout_alignBottom="@+id/tempImg" />
+        android:visibility="invisible"
+        android:saveEnabled="false"
+        android:src="@drawable/ic_accident"
+        android:layout_above="@+id/relativeLayout" />
+
 
     <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView2"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/relativeLayout"
-        android:fillViewport="false"
-        android:layout_below="@+id/tempImg">
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/relativeLayout" >
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            >
 
-            android:id="@+id/relativeLayout2"
-       >
-
-
-            <EditText
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/infoText"
-                android:hint="ใส่คำอธิบาย"
-                android:layout_below="@+id/chooseLocation"
-                android:background="@android:drawable/editbox_background_normal"
+                android:id="@+id/Actype"
+
+                android:fillViewport="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/type1"
+                        android:tag="ic_pedestrian"
+                        android:src="@drawable/ic_pedestrian"
+                        android:onClick="Click"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingBottom="5dp"
+                        android:padding="5dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:tag="ic_fire"
+                        android:layout_marginLeft="0dp"
+                        android:id="@+id/type2"
+                        android:src="@drawable/ic_fire"
+                        android:onClick="Click"
+                        android:padding="5dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/type3"
+                        android:tag="ic_flood"
+                        android:src="@drawable/ic_flood"
+                        android:onClick="Click"
+                        android:padding="5dp" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:tag="ic_accident"
+                        android:id="@+id/type4"
+                        android:src="@drawable/ic_accident"
+                        android:nestedScrollingEnabled="false"
+                        android:onClick="Click"
+                        android:padding="5dp" />
+                </LinearLayout>
+                </HorizontalScrollView>
+
+            <com.kisscompany.reportapp.activity.TouchedView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:id="@+id/touchView"
+                android:layout_below="@+id/Actype"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:textSize="15dp"
-                android:layout_marginTop="10dp" />
+             />
 
-            <TextView
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:id="@+id/tempImg"
+                android:layout_above="@+id/relativeLayout2"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="false"
+                android:layout_below="@+id/Actype"
+                />
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="เลือกสถานที่"
-                android:gravity="center_vertical"
-                android:background="@android:drawable/editbox_background"
-                android:id="@+id/chooseLocation"
-                android:textSize="15dp" />
+                android:id="@+id/relativeLayout2"
+                android:layout_below="@+id/touchView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true">
 
 
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoText"
+                    android:hint="ใส่คำอธิบาย"
+                    android:background="@android:drawable/editbox_background_normal"
+                    android:textSize="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_below="@+id/chooseLocation"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="เลือกสถานที่"
+                    android:gravity="center_vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:background="@android:drawable/editbox_background"
+                    android:id="@+id/chooseLocation"
+                    android:textSize="15dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp" />
+
+
+            </RelativeLayout>
         </RelativeLayout>
     </ScrollView>
+
 
 </RelativeLayout>

@@ -71,10 +71,13 @@ import com.kisscompany.reportapp.R;
 import com.kisscompany.reportapp.frangment.History_fragment;
 import com.kisscompany.reportapp.frangment.Main_men_fragment;
 import com.kisscompany.reportapp.frangment.Noti_fragment;
+import com.kisscompany.reportapp.frangment.Ranking_Fragment;
 import com.kisscompany.reportapp.frangment.Report_fragment;
 import com.kisscompany.reportapp.frangment.call_fragment;
 import com.kisscompany.reportapp.frangment.twitt_fragment;
+import com.kisscompany.reportapp.util.getUserData;
 import com.kisscompany.reportapp.util.sendFeedInfo;
+import com.kisscompany.reportapp.util.sendUserInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -129,6 +132,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
       /* SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit().clear();
         editor.commit();*/
+        sendUserInfo get = new sendUserInfo();
+        get.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report_user_profile.php");
         profilePictureView = (ProfilePictureView) findViewById(R.id.avatar);
         profileName = (TextView)findViewById(R.id.userName);
         getSharePref();//get old login status
@@ -176,6 +181,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
                     Intent intent = new Intent(Main_menu.this,LoginActivity.class);
                     Toast.makeText(getBaseContext(),"Please login to facebook",Toast.LENGTH_SHORT).show();
                     startActivityForResult(intent,7);
+                    tabHost.setCurrentTab(0);
                 }
                 drawer.closeDrawer(GravityCompat.START);
             }
@@ -224,8 +230,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         TabHost.TabSpec tab2 = tabHost.newTabSpec("tab2");
         TabHost.TabSpec tab3 = tabHost.newTabSpec("tab3");
         TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
-     //   TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
-        TabHost.TabSpec tab6 = tabHost.newTabSpec("tab6");
+        TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
+       // TabHost.TabSpec tab6 = tabHost.newTabSpec("tab6");
 
         v = LayoutInflater.from(this).inflate(R.layout.tab_layout,null);
 
@@ -240,16 +246,16 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
         tab4.setIndicator(v4);
 
-    /*    v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
+        v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
         tab5.setIndicator(v5);
-*/
+
 
 
         tabHost.addTab(tab1,Main_men_fragment.class,null);
         tabHost.addTab(tab2,Report_fragment.class,null);
         tabHost.addTab(tab3,Noti_fragment.class,null);
         tabHost.addTab(tab4,call_fragment.class,null);
-     //   tabHost.addTab(tab5,twitt_fragment.class,null);
+        tabHost.addTab(tab5, Ranking_Fragment.class,null);
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
 
             @Override
@@ -318,7 +324,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             }
         }
         else if(requestCode == REQUEST_EXTERNAL_STORAGE){
-            Log.d("storage","storage");
             if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {//exit
             } else {
                 if(android.os.Build.VERSION.SDK_INT >= 21)

@@ -83,7 +83,6 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         try {
             url = new URL(params[0]);
             connection = (HttpURLConnection) url.openConnection();
-            connection.getDoOutput();
             connection.setRequestMethod("POST");
             connection.connect();
 
@@ -114,6 +113,13 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         mListener.onRefreshFinished();
         return null;

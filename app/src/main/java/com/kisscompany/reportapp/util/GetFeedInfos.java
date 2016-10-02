@@ -135,13 +135,13 @@ public class GetFeedInfos {
                 return;
             }
             JSONObject JObject = JArray.getJSONObject(i);
-            String picture = URLEncoder.encode(JObject.getString("image_id"),"UTF8");
+            String picture = URLEncoder.encode(JObject.getString("resized_img_id"),"UTF8");
             String name = URLEncoder.encode(JObject.getString("name"),"UTF-8");
             String content = JObject.getString("comment");
             String stat = JObject.getString("status");
             String problem = JObject.getString("problem_type");
             String time = JObject.getString("time_stamp");
-            String faceBook = JObject.getString("facebook");
+            String faceBook = JObject.getString("facebook_id");
             String address = JObject.getString("address");
             Bitmap BitmapPic = getPicture(picture,name,0);
             if(BitmapPic ==null)
@@ -238,7 +238,7 @@ public class GetFeedInfos {
     public Bitmap getPicture(String picName,String fbName,int type) {
         String URI = "" ;
         if(type == 0)
-            URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName+"640x640.jpg";
+            URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
         else
             URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
         Bitmap bm = null;
