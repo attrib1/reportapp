@@ -39,7 +39,7 @@ public class TouchedView extends View {
     @Override
     protected void onDraw(Canvas canvas)
     {
-        // canvas.drawPath(path,paint);
+       // canvas.drawPath(path,paint);
         mCanvas.drawPath(mPath, paint);
     }
     @Override
@@ -71,7 +71,6 @@ public class TouchedView extends View {
     }
     public void setBitmap(Bitmap bit)
     {
-
         mCanvas = new Canvas(bit);
     }
 }

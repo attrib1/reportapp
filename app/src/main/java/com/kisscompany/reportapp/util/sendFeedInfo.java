@@ -62,6 +62,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
     Activity act;
     String picName;
     String fbName;
+    HttpRequestFactory requestFactory;
     boolean ok;
     public sendFeedInfo(PostClass p, Activity a)
     {
@@ -93,7 +94,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             picName = uniqueKey.toString();
             fbName = URLEncoder.encode(Main_menu.profileString,"UTF-8");
             //output.writeBytes(getUrlParam());
-
+            requestFactory = getCredential();
             createFolder("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/");
             ok = savePicture("https://storage.googleapis.com/" + "traffy_image"+"/"+fbName+"/"+URLEncoder.encode(picName,"UTF-8"),post.getPic());
             if(ok)
@@ -113,8 +114,9 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } finally {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -158,7 +160,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
             while(System.currentTimeMillis()-time < 10000) {
                 try {
                     Thread.sleep(100);
-                    putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
+                    putRequest = requestFactory.buildPutRequest(url2, contentsend);
                    response = putRequest.execute();
                     response.disconnect();
                     return true;
@@ -192,7 +194,7 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
         byte[] b = new byte[0];
         HttpContent contentsend = new ByteArrayContent("image/jpeg", b);
         HttpRequest putRequest;
-       putRequest = Main_menu.requestFactory.buildPutRequest(url2, contentsend);
+       putRequest = requestFactory.buildPutRequest(url2, contentsend);
         HttpResponse response = putRequest.execute();
           String content = response.parseAsString();
            Log.d("debug", "response is:"+response.getStatusCode());
@@ -207,5 +209,25 @@ public class sendFeedInfo extends AsyncTask<String,String,String> {
            Toast.makeText(act.getBaseContext(),"Upload fail, please try again",Toast.LENGTH_SHORT).show();
         else
            Toast.makeText(act.getBaseContext(),"Upload Complete",Toast.LENGTH_SHORT).show();
+    }
+    public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
+        List<String> scopes = new ArrayList<String>();
+        scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
+        HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
+        AssetManager am = act.getAssets();
+        InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
+        File file =stream2file(inputStream);
+        JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+                .setJsonFactory(JSON_FACTORY)
+                .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
+                .setServiceAccountScopes(scopes)
+                .setServiceAccountPrivateKeyFromP12File(file)
+                .build();
+
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
+        Log.d("finishCredential","finsih");
+
+        return requestFactory;
     }
 }

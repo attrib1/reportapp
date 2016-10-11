@@ -1,34 +1,22 @@
 package com.kisscompany.reportapp.frangment;
 
 
-import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.kisscompany.reportapp.R;
-import com.kisscompany.reportapp.activity.LoginActivity;
 import com.kisscompany.reportapp.activity.Main_menu;
-import com.kisscompany.reportapp.adapter.historyAdapter;
 import com.kisscompany.reportapp.util.GetFeedInfos;
-import com.kisscompany.reportapp.util.PostClass;
-import com.kisscompany.reportapp.util.getFeedInfo;
 
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -61,4 +61,7 @@ dependencies {
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.20.0'
     compile 'com.facebook.android:facebook-android-sdk:4.+'
     compile 'com.github.clans:fab:1.6.4'
+    compile 'com.google.android.gms:play-services:9.6.1'
+
+    compile project(path: ':BaseGameUtils')
 }

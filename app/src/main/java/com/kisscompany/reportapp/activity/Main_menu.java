@@ -1,37 +1,21 @@
 package com.kisscompany.reportapp.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -40,17 +24,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
-import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.ProfilePictureView;
@@ -60,44 +39,23 @@ import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.IOUtils;
-import com.google.api.services.storage.StorageScopes;
 import com.kisscompany.reportapp.R;
-import com.kisscompany.reportapp.frangment.History_fragment;
 import com.kisscompany.reportapp.frangment.Main_men_fragment;
-import com.kisscompany.reportapp.frangment.Noti_fragment;
+import com.kisscompany.reportapp.frangment.User_fragment;
 import com.kisscompany.reportapp.frangment.Ranking_Fragment;
 import com.kisscompany.reportapp.frangment.Report_fragment;
 import com.kisscompany.reportapp.frangment.call_fragment;
-import com.kisscompany.reportapp.frangment.twitt_fragment;
-import com.kisscompany.reportapp.util.getUserData;
-import com.kisscompany.reportapp.util.sendFeedInfo;
-import com.kisscompany.reportapp.util.sendUserInfo;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import io.fabric.sdk.android.Fabric;
 
 
 public class Main_menu extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks
         , GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    View v,v2,v3,v4,v5,v6;
+    View v,v2,v3,v4,v5;
     public static TextView title;
     DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
@@ -110,8 +68,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     private boolean gps = false;
     ListView drawerList;
     public static int loginFlag = 0;
-    final int RESULT_FALSE = 4;
-    static ImageView avatar;
     static TextView profileName;
     private FragmentTabHost tabHost;
     static ProfilePictureView profilePictureView;
@@ -119,158 +75,20 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     public static String id;
     public static String profileUrl;
     public static String profileString = "";
+    Toolbar tool;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Fabric.with(this, new Crashlytics());
         // TODO: Move this to where you establish a user session
-
-        setContentView(R.layout.activity_main_menu);
-        Toolbar tool = (Toolbar)findViewById(R.id.toolbarMain);
-
-      //  initSharePref();
-      /* SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit().clear();
-        editor.commit();*/
-        sendUserInfo get = new sendUserInfo();
-        get.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report_user_profile.php");
-        profilePictureView = (ProfilePictureView) findViewById(R.id.avatar);
-        profileName = (TextView)findViewById(R.id.userName);
+        /*sendUserInfo get = new sendUserInfo();
+        get.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report_user_profile.php");*/
+        init();
         getSharePref();//get old login status
-        try {
-            requestFactory = getCredential();
-            Log.d("cancel","cancel");
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-            buildGoogleApiClient();//connect GPS
-            googleApiClient.connect();
-
-            drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
-
-            drawer.setClickable(true);
-
-            drawerList = (ListView)findViewById(R.id.navList);
-            final ArrayList<String> list = new ArrayList<String>();
-            if(loginFlag == 1)
-                list.add("Logout");
-            final ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
-            drawerList.setAdapter(adapter);
-            drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if(loginFlag == 1) {/// logout clear Preference iamge and text
-                        LoginManager.getInstance().logOut();
-                        profilePictureView.setProfileId(null);
-                        profileName.setText("Anonymous");
-                    profileString = "Anonymous";
-                    SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit().clear();
-                    editor.commit();
-                    loginFlag = 0;
-                    list.remove(position);
-                    ((ArrayAdapter)adapter).notifyDataSetChanged();
-                    Toast.makeText(Main_menu.this, "Logout Complete", Toast.LENGTH_SHORT).show();
-                        tabHost.setCurrentTab(0);
-
-                }
-                else// if not login yet
-                {
-                    Intent intent = new Intent(Main_menu.this,LoginActivity.class);
-                    Toast.makeText(getBaseContext(),"Please login to facebook",Toast.LENGTH_SHORT).show();
-                    startActivityForResult(intent,7);
-                    tabHost.setCurrentTab(0);
-                }
-                drawer.closeDrawer(GravityCompat.START);
-            }
-        });
-                toggle = new ActionBarDrawerToggle(this, drawer, tool, R.string.drawer_open, R.string.drawer_close) {
-                    @Override
-                    public void onDrawerOpened(View view) {
-
-                        invalidateOptionsMenu();
-
-                    }
-
-                    public void onDrawerClosed(View view) {
-                        invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-                    }
-                };
-        int re = getResources().getIdentifier("ic_action_name","drawable", getPackageName());
-        toggle.setDrawerIndicatorEnabled(false);
-        toggle.setHomeAsUpIndicator(ResourcesCompat.getDrawable(getResources(),re,null));
-        title = (TextView)findViewById(R.id.main_toolbar_title);
-        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {///when slide bar is toggled
-            @Override
-            public void onClick(View v) {
-                if (drawer.isDrawerVisible(GravityCompat.START)) {
-                    drawer.closeDrawer(GravityCompat.START);
-                } else {
-                    list.clear();
-                    if(loginFlag == 1) {
-
-                        list.add("Logout");
-                    }
-                    else
-                    {
-                        list.add("Login");
-                    }
-                    ((ArrayAdapter)adapter).notifyDataSetChanged();
-                    drawer.openDrawer(GravityCompat.START);
-                }
-            }
-        });
-        drawer.addDrawerListener(toggle);
-        tabHost = (FragmentTabHost)findViewById(R.id.tab);/////////////////create tab host
-        tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
-        Resources res = getResources();
-        final TabHost.TabSpec tab1 = tabHost.newTabSpec("tab1");
-        TabHost.TabSpec tab2 = tabHost.newTabSpec("tab2");
-        TabHost.TabSpec tab3 = tabHost.newTabSpec("tab3");
-        TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
-        TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
-       // TabHost.TabSpec tab6 = tabHost.newTabSpec("tab6");
-
-        v = LayoutInflater.from(this).inflate(R.layout.tab_layout,null);
-
-        tab1.setIndicator(v);
-
-        v2 = LayoutInflater.from(this).inflate(R.layout.tab2_layout,null);
-
-        v3 = LayoutInflater.from(this).inflate(R.layout.tab3_layout,null);
-        tab2.setIndicator(v2);
-        tab3.setIndicator(v3);
-
-        v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
-        tab4.setIndicator(v4);
-
-        v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
-        tab5.setIndicator(v5);
-
-
-
-        tabHost.addTab(tab1,Main_men_fragment.class,null);
-        tabHost.addTab(tab2,Report_fragment.class,null);
-        tabHost.addTab(tab3,Noti_fragment.class,null);
-        tabHost.addTab(tab4,call_fragment.class,null);
-        tabHost.addTab(tab5, Ranking_Fragment.class,null);
-        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-
-            @Override
-            public void onTabChanged(String arg0) {
-
-                setTabColor(tabHost);
-                Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
-                fg.refresher();//cancel loading api thread
-                fg.destroyCache();//destroy drawing cache
-
-            }
-
-        });
-        setTabColor(tabHost);
-        //tabHost.addTab(tab2,Report_fragment.class,null);
+        buildGoogleApiClient();//connect GPS
+        googleApiClient.connect();
+        DrawerSetUp();
+        TabSetUp();
 
 
 
@@ -280,8 +98,6 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         ImageView view;
         TextView text;
         int res;
-
-
         for(int i=0;i<tabhost.getTabWidget().getChildCount();i++) {
 
             text = (TextView)tabhost.getTabWidget().getChildAt(i).findViewById(R.id.header);
@@ -369,17 +185,8 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         }
         gps = true;
     }
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener
-            onClickListener) {
-        new AlertDialog.Builder(Main_menu.this)
-                .setMessage(message)
-                .setPositiveButton("ตกลง", onClickListener)
-                .setNegativeButton("ยกเลิก", null)
-                .create()
-                .show();
-    }
     @Override
-    public void onConnected(Bundle bundle) {
+    public void onConnected(Bundle bundle) {/// if google API connect get location
        getLocationConnect();
     }
 
@@ -394,7 +201,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
 
     }
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location) {//if location change
 
         lat = String.valueOf(location.getLatitude());
         lng = String.valueOf(location.getLongitude());
@@ -407,52 +214,33 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
     @Override
     public void onResume(){
         FacebookSdk.sdkInitialize(getApplicationContext());
-
         super.onResume();
     }
     @Override
     public void onDestroy()
     {
-        Log.d("Destroyed","end");
         super.onDestroy();
     }
     @Override
     protected void onPostCreate(Bundle saveInstant)
     {
         super.onPostCreate(saveInstant);
-        toggle.syncState();
+        toggle.syncState();//synce drawer
     }
     @Override
     protected void onActivityResult(int request_code,int result_code,Intent data)
     {
         if(request_code == 7&& result_code == RESULT_OK)/// result from facebook login
         {
-        Main_menu.loginFlag = 1;
-        setLoginFlag();
-        Main_menu.profilePictureView.setProfileId(LoginActivity.userName);
-        Main_menu.profileName.setText(LoginActivity.facebookName);
-        Main_menu.profileString = LoginActivity.facebookName;
-        Main_menu.id = LoginActivity.userName;
-        Main_menu.profileUrl = LoginActivity.profilePicUrl;
+            Main_menu.loginFlag = 1;
+            setLoginFlag();// save user value and login status
+            Main_menu.profilePictureView.setProfileId(LoginActivity.userName);
+            Main_menu.profileName.setText(LoginActivity.facebookName);
+            Main_menu.profileString = LoginActivity.facebookName;
+            Main_menu.id = LoginActivity.userName;
+            Main_menu.profileUrl = LoginActivity.profilePicUrl;
         }
         super.onActivityResult(request_code,result_code,data);
-    }
-    public void setProfilePic() throws IOException {
-        URL facebookProfileURL= new URL(LoginActivity.profilePicUrl);
-        // Bitmap bitmap = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream());
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
-        options.inSampleSize = Camera.calculateInSampleSize(options, 100,100);
-        options.inJustDecodeBounds = false;
-        final Bitmap temp = BitmapFactory.decodeStream(facebookProfileURL.openConnection().getInputStream(),null,options);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                avatar.setImageBitmap(temp);
-            }
-        });
-
     }
     @Override
     public void onBackPressed()
@@ -460,50 +248,20 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         moveTaskToBack(true);
       //  super.onBackPressed();
     }
-    public HttpRequestFactory getCredential() throws GeneralSecurityException, IOException {
-        List<String> scopes = new ArrayList<String>();
-        scopes.add(StorageScopes.DEVSTORAGE_FULL_CONTROL);
-        HttpTransport httpTransport= new com.google.api.client.http.javanet.NetHttpTransport();
-        AssetManager am = getAssets();
-        InputStream inputStream = am.open("Traffy-f869c3fe8e95.p12"); //you should not put the key in assets in prod version.
-        File file =stream2file(inputStream);
-        JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
-                .setJsonFactory(JSON_FACTORY)
-                .setServiceAccountId("storage@traffy-cloud.iam.gserviceaccount.com")
-                .setServiceAccountScopes(scopes)
-                .setServiceAccountPrivateKeyFromP12File(file)
-                .build();
-
-        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
-        Log.d("finishCredential","finsih");
-
-        return requestFactory;
-    }
-    @SuppressLint("NewApi") public static File stream2file(InputStream in) throws IOException
-    { final File tempFile = File.createTempFile("okkk", null);
-        tempFile.deleteOnExit();
-        FileOutputStream out = new FileOutputStream(tempFile);
-        IOUtils.copy(in, out);
-        return tempFile; }
-    public void getSharePref()
+    public void getSharePref()///check wheter user already login or not
     {
-        SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
-        String flag = sharedPref.getString(getString(R.string.login_status),null);
-     //   Log.d("loginWoi",flag);
+        SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);//get share pref
+        String flag = sharedPref.getString(getString(R.string.login_status),null);//get old login flag from share pref
         if(flag !=null) {
             loginFlag = Integer.parseInt(flag);
-            if(loginFlag==1)
+            if(loginFlag==1)//if already login
             {
+                ///get old value (id,name,profile picurl)
                 id = sharedPref.getString("id",null);
-
-
                 profilePictureView.setProfileId(id);
                 profileString = sharedPref.getString("Name",null);
                 profileUrl = sharedPref.getString("profileUrl",null);
-                Log.d("profileUrl",profileUrl);
                 profileName.setText(profileString);
-
             }
             else{
                 id = null;
@@ -546,7 +304,7 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
             );
         }
     }
-    public void setLoginFlag()
+    public void setLoginFlag()//save login value
     {
         SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -557,5 +315,141 @@ public class Main_menu extends AppCompatActivity implements GoogleApiClient.Conn
         Log.d("FBNAME",LoginActivity.facebookName);
         editor.commit();
     }
+    private void init()
+    {
 
+        setContentView(R.layout.activity_main_menu);
+        tool = (Toolbar)findViewById(R.id.toolbarMain);
+
+        title = (TextView)findViewById(R.id.main_toolbar_title);
+
+        profilePictureView = (ProfilePictureView) findViewById(R.id.avatar);
+        profileName = (TextView)findViewById(R.id.userName);
+
+        drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
+        drawer.setClickable(true);
+        drawerList = (ListView)findViewById(R.id.navList);
+
+        tabHost = (FragmentTabHost)findViewById(R.id.tab);/////////////////create tab host
+    }
+    private void TabSetUp()
+    {
+        tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
+        final TabHost.TabSpec tab1 = tabHost.newTabSpec("tab1");
+        TabHost.TabSpec tab2 = tabHost.newTabSpec("tab2");
+        TabHost.TabSpec tab3 = tabHost.newTabSpec("tab3");
+        TabHost.TabSpec tab4 = tabHost.newTabSpec("tab4");
+        TabHost.TabSpec tab5 = tabHost.newTabSpec("tab5");
+        // TabHost.TabSpec tab6 = tabHost.newTabSpec("tab6");
+
+        v = LayoutInflater.from(this).inflate(R.layout.tab_layout,null);
+
+        tab1.setIndicator(v);
+
+        v2 = LayoutInflater.from(this).inflate(R.layout.tab2_layout,null);
+
+        v3 = LayoutInflater.from(this).inflate(R.layout.tab3_layout,null);
+        tab2.setIndicator(v2);
+        tab3.setIndicator(v3);
+
+        v4 = LayoutInflater.from(this).inflate(R.layout.tab4_layout,null);
+        tab4.setIndicator(v4);
+
+        v5 = LayoutInflater.from(this).inflate(R.layout.tab5_layout,null);
+        tab5.setIndicator(v5);
+
+
+
+        tabHost.addTab(tab1,Main_men_fragment.class,null);
+        tabHost.addTab(tab2,Report_fragment.class,null);
+        tabHost.addTab(tab3,User_fragment.class,null);
+        tabHost.addTab(tab4,call_fragment.class,null);
+        tabHost.addTab(tab5, Ranking_Fragment.class,null);
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+
+            @Override
+            public void onTabChanged(String arg0) {
+
+                setTabColor(tabHost);
+                if(!arg0.equals("tab1")) {
+                    Main_men_fragment fg = (Main_men_fragment) getSupportFragmentManager().findFragmentByTag("tab1");
+                    fg.refresher();//cancel loading api thread
+                    fg.destroyCache();//destroy drawing cache
+                }
+
+            }
+
+        });
+        setTabColor(tabHost);
+    }
+    private void DrawerSetUp()
+    {
+        final ArrayList<String> list = new ArrayList<String>();
+        final ListAdapter adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_list_item_1,list);
+        drawerList.setAdapter(adapter);
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(loginFlag == 1) {/// logout clear Preference iamge and text
+                    LoginManager.getInstance().logOut();
+                    profilePictureView.setProfileId(null);
+                    profileName.setText("Anonymous");
+                    profileString = "Anonymous";
+                    SharedPreferences sharedPref = getSharedPreferences("Pref",Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit().clear();
+                    editor.commit();
+                    loginFlag = 0;
+                    list.remove(position);
+                    ((ArrayAdapter)adapter).notifyDataSetChanged();
+                    Toast.makeText(Main_menu.this, "Logout Complete", Toast.LENGTH_SHORT).show();
+                    tabHost.setCurrentTab(0);
+
+                }
+                else// if not login yet
+                {
+                    Intent intent = new Intent(Main_menu.this,LoginActivity.class);
+                    Toast.makeText(getBaseContext(),"Please login to facebook",Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent,7);
+                    tabHost.setCurrentTab(0);
+                }
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+        toggle = new ActionBarDrawerToggle(this, drawer, tool, R.string.drawer_open, R.string.drawer_close) {
+            @Override
+            public void onDrawerOpened(View view) {
+
+                invalidateOptionsMenu();
+
+            }
+
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        int re = getResources().getIdentifier("ic_action_name","drawable", getPackageName());
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setHomeAsUpIndicator(ResourcesCompat.getDrawable(getResources(),re,null));
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {///when slide bar is toggled
+            @Override
+            public void onClick(View v) {
+                if (drawer.isDrawerVisible(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    list.clear();
+                    if(loginFlag == 1) {
+
+                        list.add("Logout");
+                    }
+                    else
+                    {
+                        list.add("Login");
+                    }
+                    ((ArrayAdapter)adapter).notifyDataSetChanged();
+                    drawer.openDrawer(GravityCompat.START);
+                }
+            }
+        });
+        drawer.addDrawerListener(toggle);
+    }
 }

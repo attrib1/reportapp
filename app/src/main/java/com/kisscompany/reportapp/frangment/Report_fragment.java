@@ -87,51 +87,6 @@ public class Report_fragment extends Fragment {
             startActivityForResult(camera, REQUEST);
         }
         cameraView = inflater.inflate(R.layout.loading_layout, container, false);
-
-     /*   date = (TextView)cameraView.findViewById(R.id.dateText);
-        incident = (ImageView)cameraView.findViewById(R.id.incidentPic);
-        color = (ImageView)cameraView.findViewById(R.id.color);
-        typeImage = (ImageView)cameraView.findViewById(R.id.typeImage);
-        postButton = (ImageView)cameraView.findViewById(R.id.postButton);
-        info = (TextView)cameraView.findViewById(R.id.infoTxt);
-        address = (TextView)cameraView.findViewById(R.id.addressText);
-
-
-        postButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftKeyboard();
-                progress = new ProgressDialog(getContext());
-                Upload();
-                PostClass sendPost = createPost();
-                sendFeedInfo send =  new sendFeedInfo(sendPost,getActivity());
-                send.setCustomEventListener(new sendFeedInfo.OnRefreshFinishListener() {
-                    @Override
-                    public void onRefreshFinished() {
-                        setCurrentTab(0);
-                        progress.dismiss();
-                    }
-                });
-                send.execute("http://cloud.traffy.in.th/attapon/API/private_apis/report.php");
-                Toast.makeText(getContext(),"Done posting",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        ArrayList<String> item = new ArrayList<String>();//add spinner item
-        for(int i = 0 ;i < 5 ; i++)
-        {
-            item.add("problem "+(i+1));
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),R.layout.spinner_layout,item);
-        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        WindowManager wm = (WindowManager) cameraView.getContext().getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics dm = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(dm);
-        int widthInDP = Math.round(dm.widthPixels);
-        incident.getLayoutParams().height = widthInDP;*/
-
         return cameraView;
     }
     @Override

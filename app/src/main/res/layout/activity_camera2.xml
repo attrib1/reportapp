@@ -7,7 +7,47 @@
     android:layout_height="match_parent"
 
     tools:context="com.kisscompany.reportapp.activity.Camera">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/this_toolBar"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleTextColor="@android:color/white"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetRight="0dp"
+        android:background="#3d70b6">
+        <TextView
+            android:id="@+id/picture_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:text="ข้อมูล" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="รายงาน"
+            android:id="@+id/send"
+            android:layout_marginRight="10dp"
+            android:textSize="20dp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="right"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
+            android:id="@+id/backButton"
+            android:layout_marginLeft="10dp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="left"
+            android:src="@drawable/ic_navigate_back" />
+
+    </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,30 +56,6 @@
         android:id="@+id/relativeLayout"
         android:layout_alignParentBottom="true"
         >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:paddingBottom="10dp"
-            android:paddingRight="10dp"
-
-            android:id="@+id/sendTxt"
-            android:textSize="20dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="cancel"
-            android:id="@+id/cancelButt"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="10dp"
-            android:textSize="20dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignTop="@+id/sendTxt" />
 
     </RelativeLayout>
 
@@ -60,10 +76,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/scrollView2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/relativeLayout" >
+        android:layout_below="@+id/this_toolBar"
+        android:fillViewport="false">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -71,6 +85,7 @@
             >
 
             <HorizontalScrollView
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Actype"
@@ -124,34 +139,25 @@
                         android:onClick="Click"
                         android:padding="5dp" />
                 </LinearLayout>
+                <requestFocus />
                 </HorizontalScrollView>
-
-            <com.kisscompany.reportapp.activity.TouchedView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:id="@+id/touchView"
-                android:layout_below="@+id/Actype"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-             />
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/tempImg"
-                android:layout_above="@+id/relativeLayout2"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="false"
-                android:layout_below="@+id/Actype"
-                />
+                android:src="@drawable/rank1"
+                android:layout_below="@+id/Actype" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/relativeLayout2"
-                android:layout_below="@+id/touchView"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true">
+                android:layout_below="@+id/tempImg"
+                android:focusableInTouchMode="true"
+                >
 
 
                 <EditText
@@ -164,6 +170,7 @@
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:layout_below="@+id/chooseLocation"
+
                     android:layout_centerHorizontal="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
@@ -186,6 +193,7 @@
 
 
             </RelativeLayout>
+
         </RelativeLayout>
     </ScrollView>
 

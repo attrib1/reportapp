@@ -33,7 +33,7 @@ public class Ranking_Fragment extends ListFragment {
                              Bundle savedInstanceState) {
         View rankingView = inflater.inflate(R.layout.fragment_ranking, container, false);
         List<User> list = new ArrayList<User>();
-       // User u = new User("10304",103);
+
         list.add(new User("10304",96842));
         list.add(new User("10304",320));
         list.add(new User("10304",5));

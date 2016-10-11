@@ -61,13 +61,11 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("cancel","cancel10");
         progress = new ProgressDialog(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
-        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {///if new user sign in
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
-                Log.d("same", "same");
                     Bundle params = new Bundle();
                     params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
                     setFaceBookInfo(newAccessToken, params);
@@ -75,16 +73,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
         setContentView(R.layout.activity_login);
-        Log.d("cancel","cancel8");
         callbackManager = CallbackManager.Factory.create();
-        Log.d("cancel","cancel7");
         loginButton = (LoginButton) findViewById(R.id.loginButton);
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d("cancel","cancel3");
-               // Login();
                 Bundle params = new Bundle();
                 params.putString("fields", "id,name,email,gender,cover,picture.type(large)");
                 setFaceBookInfo(AccessToken.getCurrentAccessToken(),params);
@@ -113,15 +107,12 @@ public class LoginActivity extends AppCompatActivity {
                     alertDialog.show();
                 }
             }
-
              });
-
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-        Log.d("cancel","cancel2");
     }
 
 
@@ -140,7 +131,6 @@ public class LoginActivity extends AppCompatActivity {
                         if (response != null) {
                             try {
                                 JSONObject data = response.getJSONObject();
-                                Log.d("MyName",data.toString());
                                 if (data.has("picture")) {
                                     String temp = data.getJSONObject("picture").getJSONObject("data").getString("url");
                                     // set profile image to imageview using Picasso or Native methods
@@ -149,12 +139,10 @@ public class LoginActivity extends AppCompatActivity {
                                 if(data.has("id"))
                                 {
                                     userName = data.getString("id");
-                                    Log.d("id",userName);
                                 }
                                 if(data.has("name"))
                                 {
                                     facebookName = data.getString("name");
-                                    Log.d("username",facebookName);
                                 }
                                 progress.dismiss();
                                 setResult(RESULT_OK);
@@ -165,17 +153,12 @@ public class LoginActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
+                        else
+                        {
+                            Toast.makeText(getBaseContext(),"Login Fail",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }).executeAsync();
-    }
-    public void Login()
-    {
-        progress.setCancelable(false);
-        progress.setMessage("Logging in ...");
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setProgress(0);
-        progress.setMax(100);
-        progress.show();
     }
     @Override
     public void onBackPressed()

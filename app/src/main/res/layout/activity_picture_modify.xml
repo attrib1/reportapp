@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.kisscompany.reportapp.activity.Picture_modify">
+    android:layout_alignParentBottom="true">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarPicture"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleTextColor="@android:color/white"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetRight="0dp"
+        android:background="#3d70b6">
+        <TextView
+            android:id="@+id/picture_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:text="แต่งรูป" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ถัดไป"
+            android:id="@+id/nextButton"
+            android:layout_marginRight="10dp"
+            android:textSize="20dp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="right"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/tempImg"
+        android:layout_below="@+id/toolbarPicture"
+        android:layout_alignLeft="@+id/toolbarPicture"
+        android:layout_alignStart="@+id/toolbarPicture" />
+
+
+    <com.kisscompany.reportapp.activity.TouchedView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/touchView"
+        android:layout_below="@+id/toolbarPicture"
+        android:layout_alignLeft="@+id/tempImg"
+        android:layout_alignStart="@+id/tempImg"
+        android:layout_alignBottom="@+id/tempImg"
+        android:longClickable="false" />
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/painting"
+        android:layout_below="@+id/tempImg"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_pencil"
+        android:layout_marginLeft="5dp" />
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/sticker"
+        android:layout_below="@+id/tempImg"
+        android:layout_toRightOf="@+id/painting"
+        android:layout_toEndOf="@+id/painting"
+        android:src="@drawable/messenger_bubble_small_blue"
+        android:layout_marginLeft="5dp" />
+</RelativeLayout>

@@ -85,13 +85,13 @@ public class GetFeedInfos {
                 if(isCancelled())
                     return;
                 JSONObject JObject = JArray.getJSONObject(i);
-                String picture = URLEncoder.encode(JObject.getString("image_id"), "UTF8");
+                String picture = URLEncoder.encode(JObject.getString("resized_img_id"), "UTF8");
                 String name = URLEncoder.encode(JObject.getString("name"), "UTF-8");
                 String content = JObject.getString("comment");
                 String stat = JObject.getString("status");
                 String problem = JObject.getString("problem_type");
                 String time = JObject.getString("time_stamp");
-                String faceBook = JObject.getString("facebook");
+                String faceBook = JObject.getString("facebook_id");
                 String address = JObject.getString("address");
                 if (recentFeed.getDate().equals(time) && recentFeed.getFacebookID().equals(faceBook))
                     break;
@@ -108,11 +108,10 @@ public class GetFeedInfos {
             }
             recentFeed = feeds.get(0);//update recent feed
             final ArrayAdapter feedadapter;
-            if (c.equals(Main_men_fragment.class))
+            if (c.equals(Main_men_fragment.class))///check if called from which class
                 feedadapter = (NewFeed_Adapter) feedList.getAdapter();
             else
                 feedadapter = (historyAdapter) feedList.getAdapter();
-            Log.d("notify","noti");
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -144,20 +143,19 @@ public class GetFeedInfos {
             String faceBook = JObject.getString("facebook_id");
             String address = JObject.getString("address");
             Bitmap BitmapPic = getPicture(picture,name,0);
-            if(BitmapPic ==null)
+            if(BitmapPic ==null)/// if cannot find picture skip
                 continue;
             PostClass currentPost = new PostClass(BitmapPic,time,address,content,faceBook,problem);
             currentPost.setOwner(name);
             currentPost.setStatus(stat);
             currentPost.setProfilePic(getPicture(faceBook,name,1));
-            //   posts.add(currentPost);
             Log.d("notify","noti");
             newPosts.add(currentPost);
 
         }
         ready = true;
         Object a = 0;
-        synchronized (a){
+        synchronized (a){/// notify waiting thread when finish loading feed info
             a.notifyAll();
         }
     }
@@ -243,24 +241,22 @@ public class GetFeedInfos {
             URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
         Bitmap bm = null;
         long timestamp = System.currentTimeMillis();
-        while(System.currentTimeMillis() - timestamp < 5000) {
+        while(System.currentTimeMillis() - timestamp < 5000) {/// skip when waiting nore than 5 secinds
             try {
                 Thread.sleep(50);
                 URI = URI.replace("+","%20");
-                Log.d("URI",URI);
                 URL url = new URL(URI);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                bm = BitmapFactory.decodeStream(new BufferedInputStream(connection.getInputStream()));
+                bm = BitmapFactory.decodeStream(new BufferedInputStream(connection.getInputStream()));//get picture
                 connection.disconnect();
                 break;
             } catch (IOException e) {
-                URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;
+                URI = "https://storage.googleapis.com/" + "traffy_image/"+fbName+"/"+picName;// keep re-loading if can't find picture yet.
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        Log.d("PASS","PASSSSSS");
         return bm;
     }
     public boolean isCancelled()
